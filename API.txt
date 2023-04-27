@@ -1,0 +1,103 @@
+DOKUMENTASI API YODI
+
+Template Response =
+
+Success => {
+  status: "success",
+  data: (if data exist),
+  message: (if message exist),
+}
+
+Fail => {
+  status: "fail",
+  message: errorMessage
+}
+
+Error => {
+  status: 'error',
+  message: 'terjadi kesalahan pada server kami',
+}
+
+
+REGISTER 
+POST API/REGISTER
+Body Request : {
+  username: string,
+  email: string,
+  password: string,
+}
+
+Response Data = {
+  token: string,
+}
+
+fail:
+- Body request tidak lengkap
+- Username dan email sudah pernah dipakai
+- email tidak valid
+- password kurang dari 8 karakter
+
+
+LOGIN
+POST API/LOGIN
+Body Request : {
+  email: string,
+  password: string,
+}
+
+Response = {
+  token: string,
+}
+
+fail:
+- Body request tidak lengkap
+- Kredensial salah
+
+
+------ USER ------
+
+Mendapatkan data diri
+GET API/ME
+
+Response Data = {
+  username: string,
+  email: string,
+  image: string,
+  createdAt: string,
+  updatedAt: string,
+}
+
+fail:
+- Token tidak ada
+
+
+Mengajukan diri menjadi seller
+POST API/ME/UPGRADE
+
+Response Message = "Berhasil mengajukan akun seller"
+
+fail:
+- Token tidak ada
+- Sudah pernah mengajukan diri
+- Role akun bukan user
+
+
+------ SELLER ------
+
+
+
+------ ADMIN ------
+
+Meverifikasi akun seller
+POST API/ADMIN/ACCOUNT/UPGRADE
+
+Body Request = {
+  id: string; (id seller)
+}
+
+Response Message = "Seller berhasil diverifikasi"
+
+fail:
+- token bukan admin
+- Seller tidak ditemukan
+- Seller sudah diverifikasi
