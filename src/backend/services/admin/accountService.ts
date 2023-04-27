@@ -1,5 +1,3 @@
-import { nanoid } from "nanoid";
-
 import InvariantError from "@/backend/errors/InvariantError";
 
 import prisma from "../../libs/prismadb";
@@ -8,11 +6,18 @@ export const verifySellerById = async (id: string) => {
   const seller = await prisma.seller.findUnique({
     where: {
       id,
+    },
+    select: {
+      verifiedAt: true,
     }
   });
 
   if (!seller) {
     throw new InvariantError("Seller tidak ditemukan")
+  }
+
+  if (seller.verifiedAt) {
+    throw new InvariantError("Seller sudah diverifikasi");
   }
 
   const updated = await prisma.seller.update({
