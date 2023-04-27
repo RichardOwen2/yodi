@@ -22,7 +22,7 @@ enum ItemStatus {
 
 model User {
   id        String   @id
-  name      String
+  username  String
   email     String   @unique
   image     String?
   password  String
