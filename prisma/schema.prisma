@@ -21,13 +21,15 @@ enum ItemStatus {
 }
 
 model User {
-  id        String   @id
-  username  String
-  email     String   @unique
-  image     String?
-  password  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String   @id
+  username    String
+  email       String   @unique
+  image       String?
+  address     String?
+  phoneNumber String?  @map("phone_number")
+  password    String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   Seller      Seller?
   Admin       Admin?
