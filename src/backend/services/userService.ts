@@ -137,6 +137,10 @@ export const getUserProfileById = async (id: string) => {
   return user;
 };
 
+export const changeUserProfileById = async ({}) => {
+  
+}
+
 export const addUserPhotoProfileById = async ({ id, fileUrl }: { id: string; fileUrl: string; }) => {
   await _checkIfUserExistById(id);
 
