@@ -2,19 +2,24 @@ import { NextResponse } from "next/server";
 
 import errorHandler from "@/backend/utils/errorHandler";
 
-import { upgradeRoleSellerById } from "@/backend/services/userService";
-import getTokenHandler from "@/backend/utils/getTokenHandler";
+import { getItemById } from "@/backend/services/itemService";
 
-export async function POST(request: Request) {
+interface Params {
+  params: {
+    id: string
+  }
+}
+
+export async function GET(request: Request, { params: { id } }: Params) {
   try {
-    const userId = getTokenHandler(request);
-
-    await upgradeRoleSellerById(userId);
+    const item = await getItemById(id);
 
     return NextResponse.json({
       status: "success",
-      message: "Berhasil mengajukan akun seller"
-    }, { status: 201 })
+      data: {
+        item,
+      },
+    });
   } catch (error) {
     const { data, status } = errorHandler(error);
 

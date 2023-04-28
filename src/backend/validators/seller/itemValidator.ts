@@ -1,9 +1,13 @@
 import Joi from "joi";
 import InvariantError from "@/backend/errors/InvariantError";
 
-export const validateUpgradeAccountPayload = (payload: any) => {
+export const validatePostItemPayload = (payload: any) => {
   const schema = Joi.object({
-    id: Joi.string().required(),
+    title: Joi.string().required(),
+    description: Joi.string(),
+    image: Joi.string().required(),
+    price: Joi.number().required(),
+    stock: Joi.number().required(),
   });
 
   const validationResult = schema.validate(payload);
@@ -11,4 +15,4 @@ export const validateUpgradeAccountPayload = (payload: any) => {
   if (validationResult.error) {
     throw new InvariantError(validationResult.error.message);
   }
-};
+}

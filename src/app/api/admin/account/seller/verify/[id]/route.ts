@@ -4,20 +4,21 @@ import verifyAdminAccess from "@/backend/services/admin";
 import getTokenHandler from "@/backend/utils/getTokenHandler";
 
 import errorHandler from "@/backend/utils/errorHandler";
-import { validateUpgradeAccountPayload } from "@/backend/validators/admin/accountValidator";
 
 import { verifySellerById } from "@/backend/services/admin/accountService";
 
-export async function POST(request: Request) {
+interface Params {
+  params: {
+    id: string;
+  };
+}
+
+export async function POST(request: Request, { params: { id } }: Params) {
   try {
     const adminId = getTokenHandler(request);
     await verifyAdminAccess(adminId)
 
-    const body = await request.json();
-    validateUpgradeAccountPayload(body);
-
-    const { id: sellerId } = body;
-    await verifySellerById(sellerId);
+    await verifySellerById(id);
 
     return NextResponse.json({
       status: "success",

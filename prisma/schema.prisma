@@ -22,7 +22,7 @@ enum ItemStatus {
 
 model User {
   id          String   @id
-  username    String
+  username    String   @unique
   email       String   @unique
   image       String?
   address     String?
@@ -31,11 +31,11 @@ model User {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  Seller      Seller?
-  Admin       Admin?
-  ItemOrder   ItemOrder[]
-  ItemRequest ItemRequest[]
-  Item        Item[]
+  seller      Seller?
+  admin       Admin?
+  itemOrder   ItemOrder[]
+  itemRequest ItemRequest[]
+  item        Item[]
 }
 
 model Seller {
@@ -63,7 +63,7 @@ model Item {
   id          String    @id
   owner       String
   title       String
-  description String?
+  description String
   image       String
   price       Int
   stock       Int
@@ -73,8 +73,8 @@ model Item {
 
   seller Seller @relation(fields: [owner], references: [id], onDelete: Cascade)
 
-  ItemOrder ItemOrder[]
-  User      User?       @relation(fields: [userId], references: [id])
+  itemOrder ItemOrder[]
+  user      User?       @relation(fields: [userId], references: [id])
   userId    String?
 }
 
@@ -120,7 +120,7 @@ model ItemRequest {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   seller Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  ItemRequestStatus ItemRequestStatus[]
+  itemRequestStatus ItemRequestStatus[]
 
   @@map("item_request")
 }

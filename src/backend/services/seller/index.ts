@@ -5,7 +5,7 @@ import prisma from "../../libs/prismadb";
 const verifySellerAccess = async (id: string) => {
   const seller = await prisma.seller.findUnique({
     where: {
-      id,
+      userId: id,
     },
     select: {
       verifiedAt: true,
@@ -16,7 +16,7 @@ const verifySellerAccess = async (id: string) => {
     throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
   }
 
-  if (seller.verifiedAt) {
+  if (!seller.verifiedAt) {
     throw new AuthorizationError("Anda belum diverifikasi");
   }
 }
