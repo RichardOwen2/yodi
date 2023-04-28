@@ -15,15 +15,14 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
     skip: itemCount * (page - 1),
     take: itemCount,
     where: {
-      verifiedAt: {
-        not: null,
-      },
       seller: {
-        status: AccountStatus.ACTIVE,
-      },
-      user: {
-        status: AccountStatus.ACTIVE,
-      },
+        verifiedAt: {
+          not: null,
+        },
+        user: {
+          status: AccountStatus.ACTIVE,
+        }
+      }
     },
     orderBy: {
       createdAt: 'desc',
