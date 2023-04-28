@@ -121,11 +121,12 @@ Common Fail :
 - POST => Body request tidak sesuai
 
 
-Mendapatkan data diri
-GET API/ME
+Mendapatkan data diri (khusus route ini bisa diakses bahkan jika user terbanned)
+GET API/USER/ME 
 
 Response Data = {
   username: string,
+  status: string,
   email: string,
   image: string,
   createdAt: string,
@@ -134,7 +135,7 @@ Response Data = {
 
 
 Mengajukan diri menjadi seller
-POST API/ME/UPGRADE
+POST API/USER/UPGRADE
 
 Response Message = "Berhasil mengajukan akun seller"
 
@@ -151,6 +152,21 @@ Common fail :
 - Seller belum di verifikasi
 - Seller diban
 - POST => Body request tidak sesuai
+
+
+Mendapatkan data diri akun seller (khusus route ini bisa diakses bahkan jika user terbanned)
+GET API/SELLER/ME
+
+Response Data = user: {
+    id: string,
+    userId: string,
+    verifiedAt: string,
+    createdAt: string,
+    updatedAt: string
+}
+
+fail :
+- Akun seller tidak ditemukan (belum pernah diajukan)
 
 
 Mengajukan Item Penjualan
@@ -384,3 +400,24 @@ Response Data = accounts: {
 fail:
 - seller tidak ditemukan
 
+
+Melakukan ban terhadap akun
+POST API/ADMIN/ACCOUNT/[id]/BAN
+id => userId
+
+Response Message = "Berhasil melakukan ban terhadap akun"
+
+fail:
+- Akun tidak ada
+- Akun sudah dibanned
+
+
+Melakukan unban terhadap akun
+POST API/ADMIN/ACCOUNT/[id]/UNBAN
+id => userId
+
+Response Message = "Berhasil melakukan unban terhadap akun"
+
+fail:
+- Akun tidak ada
+- Akun berstatus aktif

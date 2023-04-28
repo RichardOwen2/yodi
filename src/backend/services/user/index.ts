@@ -3,7 +3,7 @@ import AuthorizationError from "@/backend/errors/AuthorizationError";
 import prisma from "../../libs/prismadb";
 import { AccountStatus } from "@prisma/client";
 
-const verifySellerAccess = async (id: string) => {
+const verifyUserAccess = async (id: string) => {
   const user = await prisma.user.findUnique({
     where: {
       id,
@@ -22,4 +22,4 @@ const verifySellerAccess = async (id: string) => {
   }
 }
 
-export default verifySellerAccess;
+export default verifyUserAccess;

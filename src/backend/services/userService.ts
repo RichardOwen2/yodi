@@ -130,6 +130,7 @@ export const getUserProfileById = async (id: string) => {
     },
     select: {
       username: true,
+      status: true,
       email: true,
       image: true,
       createdAt: true,

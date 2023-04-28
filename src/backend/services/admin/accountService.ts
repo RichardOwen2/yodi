@@ -4,18 +4,7 @@ import NotFoundError from "@/backend/errors/NotFoundError";
 import prisma from "../../libs/prismadb";
 
 import type { PaginationParams } from "@/types";
-
-const _checkIfAccountExist = async (id: string) => {
-  const account = await prisma.user.findUnique({
-    where: {
-      id,
-    },
-  });
-
-  if (!account) {
-    throw new NotFoundError("Akun tidak ditemukan");
-  }
-}
+import { AccountStatus } from "@prisma/client";
 
 export const getAccounts = async ({ page, itemCount }: PaginationParams) => {
   const accounts = await prisma.user.findMany({
@@ -106,4 +95,74 @@ export const getAccountById = async (id: string) => {
   }
 
   return account;
+}
+
+export const banAccountById = async (id: string) => {
+  const account = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      status: true,
+    },
+  });
+
+  if (!account) {
+    throw new NotFoundError("Akun tidak ditemukan");
+  }
+
+  if (account.status === AccountStatus.BANNED) {
+    throw new InvariantError("Akun telah dibanned, tidak bisa melakukan banned lagi");
+  }
+
+  const verify = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      status: AccountStatus.BANNED,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!verify) {
+    throw new InvariantError("Gagal melakukan ban akun")
+  }
+}
+
+export const unbanAccountById = async (id: string) => {
+  const account = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      status: true,
+    },
+  });
+
+  if (!account) {
+    throw new NotFoundError("Akun tidak ditemukan");
+  }
+
+  if (account.status === AccountStatus.ACTIVE) {
+    throw new InvariantError("Tidak dapat melakukan unban terhadap akun aktif");
+  }
+
+  const verify = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      status: AccountStatus.ACTIVE,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!verify) {
+    throw new InvariantError("Gagal melakukan ban akun")
+  }
 }
