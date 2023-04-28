@@ -1,10 +1,9 @@
-import { nanoid } from "nanoid"
-
 import NotFoundError from "../errors/NotFoundError";
 import InvariantError from "../errors/InvariantError";
 
 import prisma from "@/backend/libs/prismadb"
 
+import { AccountStatus } from "@prisma/client";
 import type { PaginationParams } from "@/types";
 
 export const getItems = async ({ page, itemCount }: PaginationParams) => {
@@ -18,6 +17,12 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
     where: {
       verifiedAt: {
         not: null,
+      },
+      seller: {
+        status: AccountStatus.ACTIVE,
+      },
+      user: {
+        status: AccountStatus.ACTIVE,
       },
     },
     orderBy: {

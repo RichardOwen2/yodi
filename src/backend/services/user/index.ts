@@ -4,29 +4,20 @@ import prisma from "../../libs/prismadb";
 import { AccountStatus } from "@prisma/client";
 
 const verifySellerAccess = async (id: string) => {
-  const seller = await prisma.seller.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
-      userId: id,
+      id,
     },
     select: {
-      verifiedAt: true,
-      user: {
-        select: {
-          status: true,
-        },
-      },
+      status: true,
     },
   });
 
-  if (!seller) {
+  if (!user) {
     throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
   }
 
-  if (!seller.verifiedAt) {
-    throw new AuthorizationError("Anda belum diverifikasi");
-  }
-
-  if (seller.user.status !== AccountStatus.ACTIVE) {
+  if (user?.status !== AccountStatus.ACTIVE) {
     throw new AuthorizationError("Akun anda telah dibanned");
   }
 }

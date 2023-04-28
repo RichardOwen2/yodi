@@ -57,7 +57,7 @@ fail:
 - Kredensial salah
 
 
-Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin)
+Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
 GET API/ITEM?page=x&itemCount=x&search=x
 
 jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
@@ -89,7 +89,7 @@ fail :
 - page dan itemCount bukan number
 
 
-Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh admin)
+Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
 GET API/ITEM/[id]
 
 Response Data = {
@@ -117,6 +117,7 @@ fail:
 
 Common Fail :
 - Token tidak ada
+- User diban
 - POST => Body request tidak sesuai
 
 
@@ -148,6 +149,7 @@ Common fail :
 - Token tidak ada
 - User bukan seller
 - Seller belum di verifikasi
+- Seller diban
 - POST => Body request tidak sesuai
 
 
@@ -293,6 +295,7 @@ Response Data = accounts: [
     {
         id: string,
         username: string,
+        status: string | null,
         email: string,
         image: string | null,
         address: string | null,
@@ -315,6 +318,7 @@ id => userId
 Response Data = accounts: {
     id: string,
     username: string,
+    status: string | null,
     email: string,
     image: string | null,
     address: string | null,
@@ -343,6 +347,7 @@ Response Data = accounts: [
         user: {
             id: string,
             username: string,
+            status: string | null,
             email: string,
             image: string | null,
             address: string | null,
@@ -350,7 +355,8 @@ Response Data = accounts: [
             createdAt: string,
             updatedAt: string
         }
-    }
+    },
+    { ... }
 ]
 
 
@@ -365,6 +371,7 @@ Response Data = accounts: {
     user: {
         id: string,
         username: string,
+        status: string | null,
         email: string,
         image: string | null,
         address: string | null,

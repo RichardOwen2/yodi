@@ -37,7 +37,7 @@ export const verifySellerById = async (id: string) => {
       id,
     },
     data: {
-      verifiedAt: new Date()
+      verifiedAt: new Date(),
     }
   });
 
@@ -58,6 +58,7 @@ export const getSellers = async ({ page, itemCount }: PaginationParams) => {
         select: {
           id: true,
           username: true,
+          status: true,
           email: true,
           image: true,
           address: true,
@@ -85,6 +86,7 @@ export const getSellersBySearch = async (search: string, { page, itemCount }: Pa
         select: {
           id: true,
           username: true,
+          status: true,
           email: true,
           image: true,
           address: true,
@@ -109,6 +111,7 @@ export const getSellerById = async (id: string) => {
       user: {
         select: {
           id: true,
+          status: true,
           username: true,
           email: true,
           image: true,

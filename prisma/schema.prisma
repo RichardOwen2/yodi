@@ -20,16 +20,22 @@ enum ItemStatus {
   REJECT              @map("Pesanan ditolak")
 }
 
+enum AccountStatus {
+  ACTIVE
+  BANNED
+}
+
 model User {
-  id          String   @id
-  username    String   @unique
-  email       String   @unique
+  id          String        @id
+  username    String        @unique
+  email       String        @unique
   image       String?
   address     String?
-  phoneNumber String?  @map("phone_number")
+  phoneNumber String?       @map("phone_number")
+  status      AccountStatus @default(ACTIVE)
   password    String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
 
   seller      Seller?
   admin       Admin?
@@ -39,11 +45,11 @@ model User {
 }
 
 model Seller {
-  id         String    @id
-  userId     String    @unique
-  verifiedAt DateTime? @map("verified_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
+  id         String         @id
+  userId     String         @unique
+  verifiedAt DateTime?      @map("verified_at")
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
 
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   item        Item[]
