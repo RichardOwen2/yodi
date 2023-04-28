@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid"
 
 import InvariantError from "@/backend/errors/InvariantError";
+import NotFoundError from "@/backend/errors/NotFoundError";
 
 import prisma from "@/backend/libs/prismadb"
 
@@ -122,4 +123,34 @@ export const getVerifiedItemsBySeller = async (userId: string, { page, itemCount
   });
 
   return items;
+}
+
+export const getItemsByIdandSeller = async (userId: string, itemId: string) => {
+  const item = await prisma.item.findFirst({
+    where: {
+      seller: {
+        user: {
+          id: userId
+        }
+      },
+      id: itemId
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      image: true,
+      price: true,
+      stock: true,
+      verifiedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    }
+  });
+
+  if (!item) {
+    throw new NotFoundError("Item tidak ditemukan");
+  }
+
+  return item;
 }

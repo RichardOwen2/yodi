@@ -1,37 +1,21 @@
 import InvariantError from "@/backend/errors/InvariantError";
+import NotFoundError from "@/backend/errors/NotFoundError";
 
 import prisma from "../../libs/prismadb";
 
 import type { PaginationParams } from "@/types";
 
-export const verifySellerById = async (id: string) => {
-  const seller = await prisma.seller.findUnique({
+const _checkIfAccountExist = async (id: string) => {
+  const account = await prisma.user.findUnique({
     where: {
       id,
     },
   });
 
-  if (!seller) {
-    throw new InvariantError("Seller tidak ditemukan")
+  if (!account) {
+    throw new NotFoundError("Akun tidak ditemukan");
   }
-
-  if (seller.verifiedAt) {
-    throw new InvariantError("Seller sudah diverifikasi");
-  }
-
-  const updated = await prisma.seller.update({
-    where: {
-      id,
-    },
-    data: {
-      verifiedAt: new Date()
-    }
-  });
-
-  if (!updated) {
-    throw new InvariantError("Gagal memverifikasi seller");
-  }
-};
+}
 
 export const getAccounts = async ({ page, itemCount }: PaginationParams) => {
   const accounts = await prisma.user.findMany({
@@ -89,4 +73,35 @@ export const getAccountsBySearch = async (search: string, { page, itemCount }: P
   });
 
   return accounts;
+}
+
+export const getAccountById = async (id: string) => {
+  const account = await prisma.user.findFirst({
+    select: {
+      seller: {
+        select: {
+          id: true,
+          verifiedAt: true,
+        },
+      },
+      id: true,
+      username: true,
+      email: true,
+      image: true,
+      address: true,
+      phoneNumber: true,
+      createdAt: true,
+      updatedAt: true,
+      password: false,
+    },
+    where: {
+      id
+    },
+  });
+
+  if (!account) {
+    throw new NotFoundError("Akun tidak ditemukan");
+  }
+
+  return account;
 }

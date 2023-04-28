@@ -197,6 +197,29 @@ fail :
 
 
 
+Mendapatkan Item by Id
+GET API/SELLER/ITEM/[id]
+id => itemId
+
+Response Data = {
+  items: {
+      id: string,
+      title: string,
+      description: string (default = ""),
+      image: string,
+      price: number,
+      stock: number,
+      verifiedAt: string | null, //null jika belum di verifikasi admin
+      createdAt: string,
+      updatedAt: string,
+  },
+}
+
+fail :
+- Item tidak ditemukan
+
+
+
 Mendapatkan list semua item yang sudah diverifikasi
 GET API/SELLER/ITEM?page=x&itemCount=x&search=x&verified=x
 
@@ -266,7 +289,7 @@ jika tidak memberi query page atau itemCount maka akan default page = 1, itemCou
 page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
 search -> berdasarkan username/email
 
-Response Data = "accounts": [
+Response Data = accounts: [
     {
         id: string,
         username: string,
@@ -283,3 +306,74 @@ Response Data = "accounts": [
     },
     { ... }
 ]
+
+
+Mendapatkan akun by id
+GET API/ADMIN/ACCOUNT/[id]
+id => userId
+
+Response Data = accounts: {
+    id: string,
+    username: string,
+    email: string,
+    image: string | null,
+    address: string | null,
+    phoneNumber: string | null,
+    createdAt: string,
+    updatedAt: string,
+    seller: {
+        id: string,
+        verifiedAt: string | null,
+    } | null
+}
+
+
+Mendapatkan semua akun seller
+GET API/ADMIN/SELLER?page=x&itemCount=x&search=x
+
+jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+search -> berdasarkan username/email
+
+Response Data = accounts: [
+    {
+        id: string,
+        verifiedAt: string | null,
+        createdAt: string,
+        user: {
+            id: string,
+            username: string,
+            email: string,
+            image: string | null,
+            address: string | null,
+            phoneNumber: string | null,
+            createdAt: string,
+            updatedAt: string
+        }
+    }
+]
+
+
+Mendapatkan akun seller by id
+GET API/ADMIN/SELLER/[id]
+id => sellerId
+
+Response Data = accounts: {
+    id: string,
+    verifiedAt: string | null,
+    createdAt: string,
+    user: {
+        id: string,
+        username: string,
+        email: string,
+        image: string | null,
+        address: string | null,
+        phoneNumber: string | null,
+        createdAt: string,
+        updatedAt: string
+    }
+}
+
+fail:
+- seller tidak ditemukan
+

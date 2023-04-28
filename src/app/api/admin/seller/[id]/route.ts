@@ -4,26 +4,27 @@ import verifyAdminAccess from "@/backend/services/admin";
 import getTokenHandler from "@/backend/utils/getTokenHandler";
 
 import errorHandler from "@/backend/utils/errorHandler";
-
-import { verifySellerById } from "@/backend/services/admin/accountService";
+import { getSellerById } from "@/backend/services/admin/sellerService";
 
 interface Params {
   params: {
-    id: string;
-  };
+    id: string
+  }
 }
 
-export async function POST(request: Request, { params: { id } }: Params) {
+export async function GET(request: Request, { params: { id } }: Params) {
   try {
     const adminId = getTokenHandler(request);
     await verifyAdminAccess(adminId)
 
-    await verifySellerById(id);
+    const account = await getSellerById(id);
 
     return NextResponse.json({
       status: "success",
-      message: "Seller berhasil diverifikasi"
-    });
+      data: {
+        account
+      },
+    })
   } catch (error) {
     const { data, status } = errorHandler(error);
 
@@ -33,3 +34,4 @@ export async function POST(request: Request, { params: { id } }: Params) {
     }, { status });
   }
 }
+
