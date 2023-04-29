@@ -19,15 +19,22 @@ interface verifyUserCrendentialParams {
   password: string;
 }
 
-const _verifyNewUsername = async (username: string) => {
+const _verifyNewUsernameAndEmail = async (username: string, email: string) => {
   const user = await prisma.user.findFirst({
     where: {
-      username,
+      OR: [
+        { username },
+        { email }
+      ]
     },
   });
 
-  if (user) {
+  if (user?.username === username) {
     throw new InvariantError("Username sudah digunakan");
+  }
+
+  if (user?.email === email) {
+    throw new InvariantError("Email sudah digunakan");
   }
 }
 
@@ -44,7 +51,7 @@ const _checkIfUserExistById = async (id: string) => {
 }
 
 export const addUser = async ({ username, email, password }: addUserParams) => {
-  await _verifyNewUsername(username);
+  await _verifyNewUsernameAndEmail(username, email);
 
   const id = `user-${nanoid(16)}`
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -123,6 +130,7 @@ export const getUserProfileById = async (id: string) => {
     },
     select: {
       username: true,
+      status: true,
       email: true,
       image: true,
       createdAt: true,

@@ -5,7 +5,7 @@ import prisma from "../../libs/prismadb";
 const verifyAdminAccess = async (id: string) => {
   const admin = await prisma.admin.findUnique({
     where: {
-      id,
+      userId: id,
     },
     select: {
       id: true,

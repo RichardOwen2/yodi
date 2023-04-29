@@ -18,6 +18,11 @@ Error => {
   message: 'terjadi kesalahan pada server kami',
 }
 
+------ GUEST ------
+
+Common Fail :
+- POST => Body request tidak sesuai
+
 
 REGISTER 
 POST API/REGISTER
@@ -32,7 +37,6 @@ Response Data = {
 }
 
 fail:
-- Body request tidak lengkap
 - Username dan email sudah pernah dipakai
 - email tidak valid
 - password kurang dari 8 karakter
@@ -50,54 +54,370 @@ Response = {
 }
 
 fail:
-- Body request tidak lengkap
 - Kredensial salah
+
+
+Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
+GET API/ITEM?page=x&itemCount=x&search=x
+
+jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+page -> number, itemCount -> number, search -> string | undefined
+search -> berdasarkan title
+
+Response Data = {
+    "items": [
+        {
+            seller: {
+                user: {
+                    username: string,
+                    image: string | null
+                }
+            },
+            id: string,
+            title: string,
+            description: string,
+            image: string,
+            price: number,
+            stock: number
+        },
+        { ... }
+    ]
+}
+
+fail :
+- page dan itemCount kurang dari 1
+- page dan itemCount bukan number
+
+
+Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
+GET API/ITEM/[id]
+
+Response Data = {
+  items: {
+      seller: {
+          user: {
+              username: string,
+              image: string | null
+          }
+      },
+      id: string,
+      title: string,
+      description: string,
+      image: string,
+      price: number,
+      stock: number
+  },
+}
+
+fail:
+- item tidak ditemukan
 
 
 ------ USER ------
 
-Mendapatkan data diri
-GET API/ME
+Common Fail :
+- Token tidak ada
+- User diban
+- POST => Body request tidak sesuai
+
+
+Mendapatkan data diri (khusus route ini bisa diakses bahkan jika user terbanned)
+GET API/USER/ME 
 
 Response Data = {
   username: string,
+  status: string,
   email: string,
   image: string,
   createdAt: string,
   updatedAt: string,
 }
 
-fail:
-- Token tidak ada
-
 
 Mengajukan diri menjadi seller
-POST API/ME/UPGRADE
+POST API/USER/UPGRADE
 
 Response Message = "Berhasil mengajukan akun seller"
 
 fail:
-- Token tidak ada
 - Sudah pernah mengajukan diri
 - Role akun bukan user
 
 
 ------ SELLER ------
 
+Common fail :
+- Token tidak ada
+- User bukan seller
+- Seller belum di verifikasi
+- Seller diban
+- POST => Body request tidak sesuai
+
+
+Mendapatkan data diri akun seller (khusus route ini bisa diakses bahkan jika user terbanned)
+GET API/SELLER/ME
+
+Response Data = user: {
+    id: string,
+    userId: string,
+    verifiedAt: string,
+    createdAt: string,
+    updatedAt: string
+}
+
+fail :
+- Akun seller tidak ditemukan (belum pernah diajukan)
+
+
+Mengajukan Item Penjualan
+POST API/SELLER/ITEM/SUBMIT
+
+Body Request : {
+  title: string,
+  description: string | undefined,
+  image: string,
+  price: number,
+  stock: number,
+}
+
+Response Message = "Berhasil mengajukan item penjualan"
+
+
+Mendapatkan list semua item yang diajukan
+GET API/SELLER/ITEM?page=x&itemCount=x&search=x
+
+jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+search -> berdasarkan title
+
+Response Data = {
+  items: [
+      {
+          id: string,
+          title: string,
+          description: string (default = ""),
+          image: string,
+          price: number,
+          stock: number,
+          verifiedAt: string | null, //null jika belum di verifikasi admin
+          createdAt: string,
+          updatedAt: string,
+      },
+      {
+        ...
+      }
+  ]
+}
+
+fail :
+- page dan itemCount kurang dari 1
+- page dan itemCount bukan number
+
+
+
+Mendapatkan Item by Id
+GET API/SELLER/ITEM/[id]
+id => itemId
+
+Response Data = {
+  items: {
+      id: string,
+      title: string,
+      description: string (default = ""),
+      image: string,
+      price: number,
+      stock: number,
+      verifiedAt: string | null, //null jika belum di verifikasi admin
+      createdAt: string,
+      updatedAt: string,
+  },
+}
+
+fail :
+- Item tidak ditemukan
+
+
+
+Mendapatkan list semua item yang sudah diverifikasi
+GET API/SELLER/ITEM?page=x&itemCount=x&search=x&verified=x
+
+jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+page -> number | undefined, itemCount -> number | undefined, search -> string | undefined ,verified -> string apapun
+search -> berdasarkan title
+
+Response Data = {
+  items: [
+      {
+          id: string,
+          title: string,
+          description: string (default = ""),
+          image: string,
+          price: number,
+          stock: number,
+          verifiedAt: string,
+          createdAt: string,
+          updatedAt: string,
+      },
+      {
+        ...
+      }
+  ]
+}
+
+fail :
+- page dan itemCount kurang dari 1
+- page dan itemCount bukan number
+
+
 
 
 ------ ADMIN ------
 
-Meverifikasi akun seller
-POST API/ADMIN/ACCOUNT/UPGRADE
+Common fail :
+- Token tidak ada
+- User bukan admin
 
-Body Request = {
-  id: string; (id seller)
-}
+
+Meverifikasi akun seller
+POST API/ADMIN/SELLER/VERIFY/[id]
+id => sellerId
 
 Response Message = "Seller berhasil diverifikasi"
 
 fail:
-- token bukan admin
 - Seller tidak ditemukan
 - Seller sudah diverifikasi
+
+
+Meverifikasi item seller
+POST API/ADMIN/ITEM/VERIFY/[id]
+id => itemId
+
+Response Message = "Item berhasil di verifikasi"
+
+fail:
+- Item tidak ditemukan
+- Item sudah diverifikasi
+
+
+Mendapatkan semua akun
+GET API/ADMIN/ACCOUNT?page=x&itemCount=x&search=x
+
+jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+search -> berdasarkan username/email
+
+Response Data = accounts: [
+    {
+        id: string,
+        username: string,
+        status: string | null,
+        email: string,
+        image: string | null,
+        address: string | null,
+        phoneNumber: string | null,
+        createdAt: string,
+        updatedAt: string,
+        seller: {
+            id: string,
+            verifiedAt: string | null,
+        } | null
+    },
+    { ... }
+]
+
+
+Mendapatkan akun by id
+GET API/ADMIN/ACCOUNT/[id]
+id => userId
+
+Response Data = accounts: {
+    id: string,
+    username: string,
+    status: string | null,
+    email: string,
+    image: string | null,
+    address: string | null,
+    phoneNumber: string | null,
+    createdAt: string,
+    updatedAt: string,
+    seller: {
+        id: string,
+        verifiedAt: string | null,
+    } | null
+}
+
+
+Mendapatkan semua akun seller
+GET API/ADMIN/SELLER?page=x&itemCount=x&search=x
+
+jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+search -> berdasarkan username/email
+
+Response Data = accounts: [
+    {
+        id: string,
+        verifiedAt: string | null,
+        createdAt: string,
+        user: {
+            id: string,
+            username: string,
+            status: string | null,
+            email: string,
+            image: string | null,
+            address: string | null,
+            phoneNumber: string | null,
+            createdAt: string,
+            updatedAt: string
+        }
+    },
+    { ... }
+]
+
+
+Mendapatkan akun seller by id
+GET API/ADMIN/SELLER/[id]
+id => sellerId
+
+Response Data = accounts: {
+    id: string,
+    verifiedAt: string | null,
+    createdAt: string,
+    user: {
+        id: string,
+        username: string,
+        status: string | null,
+        email: string,
+        image: string | null,
+        address: string | null,
+        phoneNumber: string | null,
+        createdAt: string,
+        updatedAt: string
+    }
+}
+
+fail:
+- seller tidak ditemukan
+
+
+Melakukan ban terhadap akun
+POST API/ADMIN/ACCOUNT/[id]/BAN
+id => userId
+
+Response Message = "Berhasil melakukan ban terhadap akun"
+
+fail:
+- Akun tidak ada
+- Akun sudah dibanned
+
+
+Melakukan unban terhadap akun
+POST API/ADMIN/ACCOUNT/[id]/UNBAN
+id => userId
+
+Response Message = "Berhasil melakukan unban terhadap akun"
+
+fail:
+- Akun tidak ada
+- Akun berstatus aktif
