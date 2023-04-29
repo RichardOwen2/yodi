@@ -27,6 +27,9 @@ export const getAccounts = async ({ page, itemCount }: PaginationParams) => {
       updatedAt: true,
       password: false,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   return accounts;
@@ -59,6 +62,9 @@ export const getAccountsBySearch = async (search: string, { page, itemCount }: P
         { username: { contains: search } },
         { email: { contains: search } }
       ]
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 

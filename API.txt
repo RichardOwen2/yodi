@@ -289,17 +289,6 @@ fail:
 - Seller sudah diverifikasi
 
 
-Meverifikasi item seller
-POST API/ADMIN/ITEM/VERIFY/[id]
-id => itemId
-
-Response Message = "Item berhasil di verifikasi"
-
-fail:
-- Item tidak ditemukan
-- Item sudah diverifikasi
-
-
 Mendapatkan semua akun
 GET API/ADMIN/ACCOUNT?page=x&itemCount=x&search=x
 
@@ -421,3 +410,77 @@ Response Message = "Berhasil melakukan unban terhadap akun"
 fail:
 - Akun tidak ada
 - Akun berstatus aktif
+
+
+Meverifikasi item seller
+POST API/ADMIN/ITEM/[id]/VERIFY
+id => itemId
+
+Response Message = "Item berhasil di verifikasi"
+
+fail:
+- Item tidak ditemukan
+- Item sudah diverifikasi
+
+
+Mendapatkan semua item
+GET API/ADMIN/ITEM?page=x&itemCount=x&search=x
+
+jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+search -> berdasarkan username/email
+
+Response Data = items: [
+    {
+        id: string,
+        title: string,
+        description: string,
+        image: string,
+        price: number,
+        stock: number,
+        verifiedAt: string,
+        createdAt: string,
+        updatedAt: string,
+        seller: {
+            id: string,
+            verifiedAt: string | null,
+            user: {
+                username: string,
+                email: string,
+                image: string | null,
+                status: string
+            }
+        }
+    },
+    { ... }
+]
+
+
+Mendapatkan item by id
+GET API/ADMIN/ITEM/[id]
+id => itemId
+
+Response Data = item: {
+    id: string,
+    title: string,
+    description: string,
+    image: string,
+    price: number,
+    stock: number,
+    verifiedAt: string,
+    createdAt: string,
+    updatedAt: string,
+    seller: {
+        id: string,
+        verifiedAt: string | null,
+        user: {
+            username: string,
+            email: string,
+            image: string | null,
+            status: string
+        }
+    }
+}
+
+fail :
+- jika item tidak ditemukan

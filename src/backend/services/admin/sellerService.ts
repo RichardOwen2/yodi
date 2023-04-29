@@ -69,6 +69,9 @@ export const getSellers = async ({ page, itemCount }: PaginationParams) => {
         }
       },
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   return accounts;
@@ -96,6 +99,9 @@ export const getSellersBySearch = async (search: string, { page, itemCount }: Pa
           password: false,
         }
       },
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 
