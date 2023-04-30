@@ -19,6 +19,14 @@ interface verifyUserCrendentialParams {
   password: string;
 }
 
+interface upgradeRoleSellerByIdParams {
+  city: string;
+  address: string;
+  bankName: string;
+  bankNumber: string;
+  ownerName: string;
+}
+
 const _verifyNewUsernameAndEmail = async (username: string, email: string) => {
   const user = await prisma.user.findFirst({
     where: {
@@ -26,6 +34,10 @@ const _verifyNewUsernameAndEmail = async (username: string, email: string) => {
         { username },
         { email }
       ]
+    },
+    select: {
+      username: true,
+      email: true,
     },
   });
 
@@ -80,6 +92,10 @@ export const verifyUserCrendential = async ({ email, password }: verifyUserCrend
     where: {
       email,
     },
+    select: {
+      id: true,
+      password: true,
+    },
   });
 
   if (!user) {
@@ -104,6 +120,9 @@ export const getUserRoleById = async (id: string): Promise<UserRole> => {
     where: {
       userId: id
     },
+    select: {
+      id: true,
+    },
   });
 
   if (admin) {
@@ -113,6 +132,9 @@ export const getUserRoleById = async (id: string): Promise<UserRole> => {
   const seller = await prisma.seller.findUnique({
     where: {
       userId: id
+    },
+    select: {
+      id: true,
     },
   });
 
@@ -145,8 +167,8 @@ export const getUserProfileById = async (id: string) => {
   return user;
 };
 
-export const changeUserProfileById = async ({}) => {
-  
+export const changeUserProfileById = async ({ }) => {
+
 }
 
 export const addUserPhotoProfileById = async ({ id, fileUrl }: { id: string; fileUrl: string; }) => {
@@ -171,7 +193,16 @@ export const addUserPhotoProfileById = async ({ id, fileUrl }: { id: string; fil
   return user;
 }
 
-export const upgradeRoleSellerById = async (userId: string) => {
+export const upgradeRoleSellerById = async (
+  userId: string,
+  {
+    city,
+    address,
+    bankName,
+    bankNumber,
+    ownerName,
+  }: upgradeRoleSellerByIdParams
+) => {
   const userRole = await getUserRoleById(userId);
 
   if (userRole === UserRole.SELLER) {
@@ -186,6 +217,15 @@ export const upgradeRoleSellerById = async (userId: string) => {
     data: {
       id,
       userId,
+      city,
+      address,
+      bank: {
+        create: {
+          bankName,
+          bankNumber,
+          ownerName
+        }
+      }
     },
     select: {
       id: true,

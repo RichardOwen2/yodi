@@ -30,6 +30,7 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
     select: {
       seller: {
         select: {
+          city: true,
           user: {
             select: {
               username: true,
@@ -59,8 +60,13 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
     skip: itemCount * (page - 1),
     take: itemCount,
     where: {
-      verifiedAt: {
-        not: null,
+      seller: {
+        verifiedAt: {
+          not: null,
+        },
+        user: {
+          status: AccountStatus.ACTIVE,
+        }
       },
       title: {
         contains: search,
@@ -72,6 +78,7 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
     select: {
       seller: {
         select: {
+          city: true,
           user: {
             select: {
               username: true,
@@ -96,13 +103,20 @@ export const getItemById = async (itemId: string) => {
   const item = await prisma.item.findFirst({
     where: {
       id: itemId,
-      verifiedAt: {
-        not: null,
+      seller: {
+        verifiedAt: {
+          not: null,
+        },
+        user: {
+          status: AccountStatus.ACTIVE,
+        }
       },
     },
     select: {
       seller: {
         select: {
+          city: true,
+          address: true,
           user: {
             select: {
               username: true,
@@ -125,4 +139,31 @@ export const getItemById = async (itemId: string) => {
   }
 
   return item;
+}
+
+export const getItemStockById = async (itemId: string) => {
+  const stock = await prisma.item.findFirst({
+    where: {
+      id: itemId,
+      seller: {
+        verifiedAt: {
+          not: null,
+        },
+        user: {
+          status: AccountStatus.ACTIVE,
+        }
+      },
+    },
+    select: {
+      title: true,
+      stock: true,
+      price: true,
+    },
+  });
+
+  if (!stock) {
+    throw new NotFoundError("Item tidak ditemukan");
+  }
+
+  return stock;
 }

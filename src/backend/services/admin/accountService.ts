@@ -21,11 +21,13 @@ export const getAccounts = async ({ page, itemCount }: PaginationParams) => {
       username: true,
       email: true,
       image: true,
-      address: true,
       phoneNumber: true,
       createdAt: true,
       updatedAt: true,
       password: false,
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 
@@ -48,7 +50,6 @@ export const getAccountsBySearch = async (search: string, { page, itemCount }: P
       status: true,
       email: true,
       image: true,
-      address: true,
       phoneNumber: true,
       createdAt: true,
       updatedAt: true,
@@ -59,6 +60,9 @@ export const getAccountsBySearch = async (search: string, { page, itemCount }: P
         { username: { contains: search } },
         { email: { contains: search } }
       ]
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 
@@ -79,7 +83,6 @@ export const getAccountById = async (id: string) => {
       status: true,
       email: true,
       image: true,
-      address: true,
       phoneNumber: true,
       createdAt: true,
       updatedAt: true,

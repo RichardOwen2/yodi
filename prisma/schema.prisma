@@ -30,7 +30,6 @@ model User {
   username    String        @unique
   email       String        @unique
   image       String?
-  address     String?
   phoneNumber String?       @map("phone_number")
   status      AccountStatus @default(ACTIVE)
   password    String
@@ -42,18 +41,31 @@ model User {
   itemOrder   ItemOrder[]
   itemRequest ItemRequest[]
   item        Item[]
+  Cart        Cart[]
 }
 
 model Seller {
-  id         String         @id
-  userId     String         @unique
-  verifiedAt DateTime?      @map("verified_at")
-  createdAt  DateTime       @default(now()) @map("created_at")
-  updatedAt  DateTime       @updatedAt @map("updated_at")
+  id         String    @id
+  userId     String    @unique
+  city       String
+  address    String
+  verifiedAt DateTime? @map("verified_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   item        Item[]
   ItemRequest ItemRequest[]
+  bank        Bank?
+}
+
+model Bank {
+  userId     String @id @map("user_id")
+  bankName   String @map("bank_name")
+  bankNumber String @map("bank_number")
+  ownerName  String @map("owner_name")
+
+  seller Seller @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Admin {
@@ -80,14 +92,30 @@ model Item {
   seller Seller @relation(fields: [owner], references: [id], onDelete: Cascade)
 
   itemOrder ItemOrder[]
+  Cart      Cart[]
   user      User?       @relation(fields: [userId], references: [id])
   userId    String?
+}
+
+model Cart {
+  id        String   @id
+  userId    String   @map("user_id")
+  itemId    String   @map("item_id")
+  amount    Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
 }
 
 model ItemOrder {
   id        String   @id
   userId    String   @map("user_id")
   itemId    String   @map("item_id")
+  price     Int
   amount    Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -116,6 +144,7 @@ model ItemRequest {
   id          String   @id
   userId      String   @map("user_id")
   sellerId    String   @map("seller_id")
+  itemName    String   @map("item_name")
   image       String
   description String
   price       Int

@@ -85,7 +85,10 @@ export const getItemsBySeller = async (userId: string, { page, itemCount }: Pagi
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
-    }
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   return items;
@@ -119,7 +122,10 @@ export const getVerifiedItemsBySeller = async (userId: string, { page, itemCount
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
-    }
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   return items;
@@ -145,7 +151,10 @@ export const getItemsByIdandSeller = async (userId: string, itemId: string) => {
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
-    }
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   if (!item) {
