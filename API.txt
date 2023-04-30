@@ -24,93 +24,96 @@ Common Fail :
 - POST => Body request tidak sesuai
 
 
-REGISTER 
-POST API/REGISTER
-Body Request : {
-  username: string,
-  email: string,
-  password: string,
-}
+REGISTER
+  POST API/REGISTER
+  Body Request : {
+    username: string,
+    email: string,
+    password: string,
+  }
 
-Response Data = {
-  token: string,
-}
+  Response Data = {
+    token: string,
+  }
 
-fail:
-- Username dan email sudah pernah dipakai
-- email tidak valid
-- password kurang dari 8 karakter
+  fail:
+  - Username dan email sudah pernah dipakai
+  - email tidak valid
+  - password kurang dari 8 karakter
 
 
 LOGIN
-POST API/LOGIN
-Body Request : {
-  email: string,
-  password: string,
-}
+  POST API/LOGIN
+  Body Request : {
+    email: string,
+    password: string,
+  }
 
-Response = {
-  token: string,
-}
+  Response = {
+    token: string,
+  }
 
-fail:
-- Kredensial salah
+  fail:
+  - Kredensial salah
 
 
 Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
-GET API/ITEM?page=x&itemCount=x&search=x
+  GET API/ITEM?page=x&itemCount=x&search=x
 
-jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
-page -> number, itemCount -> number, search -> string | undefined
-search -> berdasarkan title
+  jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+  page -> number, itemCount -> number, search -> string | undefined
+  search -> berdasarkan title
 
-Response Data = {
-    "items": [
-        {
-            seller: {
-                user: {
-                    username: string,
-                    image: string | null
-                }
-            },
-            id: string,
-            title: string,
-            description: string,
-            image: string,
-            price: number,
-            stock: number
-        },
-        { ... }
-    ]
-}
+  Response Data = {
+      "items": [
+          {
+              seller: {
+                city: string,
+                  user: {
+                      username: string,
+                      image: string | null
+                  }
+              },
+              id: string,
+              title: string,
+              description: string,
+              image: string,
+              price: number,
+              stock: number
+          },
+          { ... }
+      ]
+  }
 
-fail :
-- page dan itemCount kurang dari 1
-- page dan itemCount bukan number
+  fail :
+  - page dan itemCount kurang dari 1
+  - page dan itemCount bukan number
 
 
 Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
-GET API/ITEM/[id]
+  GET API/ITEM/[id]
 
-Response Data = {
-  items: {
-      seller: {
-          user: {
-              username: string,
-              image: string | null
-          }
-      },
-      id: string,
-      title: string,
-      description: string,
-      image: string,
-      price: number,
-      stock: number
-  },
-}
+  Response Data = {
+    items: {
+        seller: {
+          city: string,
+          address: string,
+            user: {
+                username: string,
+                image: string | null
+            }
+        },
+        id: string,
+        title: string,
+        description: string,
+        image: string,
+        price: number,
+        stock: number
+    },
+  }
 
-fail:
-- item tidak ditemukan
+  fail:
+  - item tidak ditemukan
 
 
 ------ USER ------
@@ -122,96 +125,157 @@ Common Fail :
 
 
 Mendapatkan data diri (khusus route ini bisa diakses bahkan jika user terbanned)
-GET API/USER/ME 
+  GET API/USER/ME 
 
-Response Data = {
-  username: string,
-  status: string,
-  email: string,
-  image: string,
-  createdAt: string,
-  updatedAt: string,
-}
+  Response Data = {
+    username: string,
+    status: string,
+    email: string,
+    image: string,
+    createdAt: string,
+    updatedAt: string,
+  }
 
 
 Mengajukan diri menjadi seller
-POST API/USER/UPGRADE
+  POST API/USER/UPGRADE
 
-Response Message = "Berhasil mengajukan akun seller"
+  Request Body = {
+    city: string;
+    address: string;
+    bankName: string;
+    bankNumber: string;
+    ownerName: string;
+  }
 
-fail:
-- Sudah pernah mengajukan diri
-- Role akun bukan user
+  Response Message = "Berhasil mengajukan akun seller"
+
+  fail:
+  - Sudah pernah mengajukan diri
+  - Role akun bukan user
 
 
 Mendapatkan item di cart
-GET API/USER/CART
+  GET API/USER/CART
 
-Response Data = cart: [
-    {
-        item: {
-            seller: {
-                user: {
-                    username: string;
-                    image: string | null;
-                };
-            };
-            id: string;
-            image: string;
-            title: string;
-            description: string;
-            price: number;
-            stock: number;
-        };
-        amount: number;
-    },
-    { ... }
-]
+  Response Data = cart: [
+      {
+          item: {
+              seller: {
+                  city: string,
+                  user: {
+                      username: string,
+                      image: string | null,
+                  },
+              },
+              id: string,
+              image: string,
+              title: string,
+              description: string,
+              price: number,
+              stock: number,
+          },
+          amount: number,
+      },
+      { ... }
+  ]
+
+  note : jika seller sewaktu-waktu tekena banned, item dlm cart tidak akan ditampilkan
 
 
 Menambahkan item di cart
-POST API/USER/CART
+  POST API/USER/CART
 
-Body Request = {
-  itemId: string,
-  amount: number
-}
+  Body Request = {
+    itemId: string,
+    amount: number
+  }
 
-Response Message = `Berhasil menambahkan ${title} didalam cart`
+  Response Message = `Berhasil menambahkan ${title} didalam cart`
 
-fail : 
-- Amount lebih besar dari stock item yang tersedia
-- Item tidak ditemukan
+  fail : 
+  - Amount lebih besar dari stock item yang tersedia
+  - amount kurang dari 1
+  - Item tidak ditemukan
+  - Seller terbanned
 
 
 Mengubah amount item di cart
-PUT API/USER/CART
+  PUT API/USER/CART
 
-Body Request = {
-  itemId: string,
-  amount: number
-}
+  Body Request = {
+    itemId: string,
+    amount: number
+  }
 
-Response Message = `Berhasil melakukan edit jumlah ${title} didalam cart`
+  Response Message = `Berhasil melakukan edit jumlah ${title} didalam cart`
 
-fail : 
-- Amount lebih besar dari stock item yang tersedia
-- Cart item tidak ditemukan
-- Jika mencoba update cart dengan amount yang sama, api akan ttp success tetapi tidak merubah database
+  fail : 
+  - Amount lebih besar dari stock item yang tersedia
+  - amount kurang dari 1
+  - Cart item tidak ditemukan
+  - Jika mencoba update cart dengan amount yang sama, api akan ttp success tetapi tidak merubah database
+  - Seller terbanned
 
 
 Menghapus item dalam cart
-DELETE API/USER/CART
+  DELETE API/USER/CART
 
-Body Request = {
-  amount: number
-}
+  Body Request = {
+    amount: number
+  }
 
-Response Message = `Berhasil menghapus ${title} didalam cart`
+  Response Message = `Berhasil menghapus ${title} didalam cart`
 
-fail :
-- item tidak ditemukan
+  fail :
+  - item tidak ditemukan
+  - amount kurang dari 1
+  
+  note :
+  - dapat dihapus meskipun seller terbanned
 
+
+Mendapatkan list item checkout/order
+  GET API/USER/ORDER?page=x&itemCount=x&search=x
+
+  jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+  page -> number, itemCount -> number, search -> string | undefined
+  search -> berdasarkan title
+
+  Response Data = orders: [
+      {
+          price: number,
+          amount: number,
+          item: {
+              title: string,
+              image: string,
+              seller: {
+                  city: string,
+                  user: {
+                      username: string,
+                      phoneNumber: string
+                  }
+              }
+          }
+      },
+      { ... }
+  ]
+
+Melakukan checkout/order item
+  POST API/USER/ORDER
+
+  Body Request = {
+    itemId: string,
+    amount: number
+  }
+
+  Response Message = `Berhasil melakukan checkout ${title}`
+
+  fail :
+  - item tidak ditemukan
+  - amount melebihi stock item
+  - amount kurang dari 1
+  - seller terbanned
 
 ------ SELLER ------
 
@@ -224,120 +288,116 @@ Common fail :
 
 
 Mendapatkan data diri akun seller (khusus route ini bisa diakses bahkan jika user terbanned)
-GET API/SELLER/ME
+  GET API/SELLER/ME
 
-Response Data = user: {
-    id: string,
-    userId: string,
-    verifiedAt: string,
-    createdAt: string,
-    updatedAt: string
-}
+  Response Data = user: {
+      id: string,
+      userId: string,
+      verifiedAt: string,
+      createdAt: string,
+      updatedAt: string
+  }
 
-fail :
-- Akun seller tidak ditemukan (belum pernah diajukan)
+  fail :
+  - Akun seller tidak ditemukan (belum pernah diajukan)
 
 
 Mengajukan Item Penjualan
-POST API/SELLER/ITEM/SUBMIT
+  POST API/SELLER/ITEM/SUBMIT
 
-Body Request : {
-  title: string,
-  description: string | undefined,
-  image: string,
-  price: number,
-  stock: number,
-}
+  Body Request : {
+    title: string,
+    description: string | undefined,
+    image: string,
+    price: number,
+    stock: number,
+  }
 
-Response Message = "Berhasil mengajukan item penjualan"
+  Response Message = "Berhasil mengajukan item penjualan"
 
 
 Mendapatkan list semua item yang diajukan
-GET API/SELLER/ITEM?page=x&itemCount=x&search=x
+  GET API/SELLER/ITEM?page=x&itemCount=x&search=x
 
-jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
-page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
-search -> berdasarkan title
+  jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+  page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+  search -> berdasarkan title
 
-Response Data = {
-  items: [
-      {
-          id: string,
-          title: string,
-          description: string (default = ""),
-          image: string,
-          price: number,
-          stock: number,
-          verifiedAt: string | null, //null jika belum di verifikasi admin
-          createdAt: string,
-          updatedAt: string,
-      },
-      {
-        ...
-      }
-  ]
-}
+  Response Data = {
+    items: [
+        {
+            id: string,
+            title: string,
+            description: string (default = ""),
+            image: string,
+            price: number,
+            stock: number,
+            verifiedAt: string | null, //null jika belum di verifikasi admin
+            createdAt: string,
+            updatedAt: string,
+        },
+        {
+          ...
+        }
+    ]
+  }
 
-fail :
-- page dan itemCount kurang dari 1
-- page dan itemCount bukan number
-
+  fail :
+  - page dan itemCount kurang dari 1
+  - page dan itemCount bukan number
 
 
 Mendapatkan Item by Id
-GET API/SELLER/ITEM/[id]
-id => itemId
+  GET API/SELLER/ITEM/[id]
+  id => itemId
 
-Response Data = {
-  items: {
-      id: string,
-      title: string,
-      description: string (default = ""),
-      image: string,
-      price: number,
-      stock: number,
-      verifiedAt: string | null, //null jika belum di verifikasi admin
-      createdAt: string,
-      updatedAt: string,
-  },
-}
+  Response Data = {
+    items: {
+        id: string,
+        title: string,
+        description: string (default = ""),
+        image: string,
+        price: number,
+        stock: number,
+        verifiedAt: string | null, //null jika belum di verifikasi admin
+        createdAt: string,
+        updatedAt: string,
+    },
+  }
 
-fail :
-- Item tidak ditemukan
-
+  fail :
+  - Item tidak ditemukan
 
 
 Mendapatkan list semua item yang sudah diverifikasi
-GET API/SELLER/ITEM?page=x&itemCount=x&search=x&verified=x
+  GET API/SELLER/ITEM?page=x&itemCount=x&search=x&verified=x
 
-jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
-page -> number | undefined, itemCount -> number | undefined, search -> string | undefined ,verified -> string apapun
-search -> berdasarkan title
+  jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+  page -> number | undefined, itemCount -> number | undefined, search -> string | undefined ,verified -> string apapun
+  search -> berdasarkan title
 
-Response Data = {
-  items: [
-      {
-          id: string,
-          title: string,
-          description: string (default = ""),
-          image: string,
-          price: number,
-          stock: number,
-          verifiedAt: string,
-          createdAt: string,
-          updatedAt: string,
-      },
-      {
-        ...
-      }
-  ]
-}
+  Response Data = {
+    items: [
+        {
+            id: string,
+            title: string,
+            description: string (default = ""),
+            image: string,
+            price: number,
+            stock: number,
+            verifiedAt: string,
+            createdAt: string,
+            updatedAt: string,
+        },
+        {
+          ...
+        }
+    ]
+  }
 
-fail :
-- page dan itemCount kurang dari 1
-- page dan itemCount bukan number
-
-
+  fail :
+  - page dan itemCount kurang dari 1
+  - page dan itemCount bukan number
 
 
 ------ ADMIN ------
@@ -348,208 +408,207 @@ Common fail :
 
 
 Meverifikasi akun seller
-POST API/ADMIN/SELLER/VERIFY/[id]
-id => sellerId
+  POST API/ADMIN/SELLER/[id]/VERIFY
+  id => sellerId
 
-Response Message = "Seller berhasil diverifikasi"
+  Response Message = "Seller berhasil diverifikasi"
 
-fail:
-- Seller tidak ditemukan
-- Seller sudah diverifikasi
+  fail:
+  - Seller tidak ditemukan
+  - Seller sudah diverifikasi
 
 
 Mendapatkan semua akun
-GET API/ADMIN/ACCOUNT?page=x&itemCount=x&search=x
+  GET API/ADMIN/ACCOUNT?page=x&itemCount=x&search=x
 
-jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
-page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
-search -> berdasarkan username/email
+  jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+  page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+  search -> berdasarkan username/email
 
-Response Data = accounts: [
-    {
-        id: string,
-        username: string,
-        status: string | null,
-        email: string,
-        image: string | null,
-        address: string | null,
-        phoneNumber: string | null,
-        createdAt: string,
-        updatedAt: string,
-        seller: {
-            id: string,
-            verifiedAt: string | null,
-        } | null
-    },
-    { ... }
-]
+  Response Data = accounts: [
+      {
+          id: string,
+          username: string,
+          status: string | null,
+          email: string,
+          image: string | null,
+          phoneNumber: string | null,
+          createdAt: string,
+          updatedAt: string,
+          seller: {
+              id: string,
+              verifiedAt: string | null,
+          } | null
+      },
+      { ... }
+  ]
 
 
 Mendapatkan akun by id
-GET API/ADMIN/ACCOUNT/[id]
-id => userId
+  GET API/ADMIN/ACCOUNT/[id]
+  id => userId
 
-Response Data = accounts: {
-    id: string,
-    username: string,
-    status: string | null,
-    email: string,
-    image: string | null,
-    address: string | null,
-    phoneNumber: string | null,
-    createdAt: string,
-    updatedAt: string,
-    seller: {
-        id: string,
-        verifiedAt: string | null,
-    } | null
-}
+  Response Data = accounts: {
+      id: string,
+      username: string,
+      status: string | null,
+      email: string,
+      image: string | null,
+      phoneNumber: string | null,
+      createdAt: string,
+      updatedAt: string,
+      seller: {
+          id: string,
+          verifiedAt: string | null,
+      } | null
+  }
 
 
 Mendapatkan semua akun seller
-GET API/ADMIN/SELLER?page=x&itemCount=x&search=x
+  GET API/ADMIN/SELLER?page=x&itemCount=x&search=x
 
-jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
-page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
-search -> berdasarkan username/email
+  jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+  page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+  search -> berdasarkan username/email
 
-Response Data = accounts: [
-    {
-        id: string,
-        verifiedAt: string | null,
-        createdAt: string,
-        user: {
-            id: string,
-            username: string,
-            status: string | null,
-            email: string,
-            image: string | null,
-            address: string | null,
-            phoneNumber: string | null,
-            createdAt: string,
-            updatedAt: string
-        }
-    },
-    { ... }
-]
+  Response Data = accounts: [
+      {
+          id: string,
+          city: string,
+          verifiedAt: string | null,
+          createdAt: string,
+          user: {
+              username: string,
+              status: string,
+              email: string,
+          }
+      },
+      { ... }
+  ]
 
 
 Mendapatkan akun seller by id
-GET API/ADMIN/SELLER/[id]
-id => sellerId
+  GET API/ADMIN/SELLER/[id]
+  id => sellerId
 
-Response Data = accounts: {
-    id: string,
-    verifiedAt: string | null,
-    createdAt: string,
-    user: {
-        id: string,
-        username: string,
-        status: string | null,
-        email: string,
-        image: string | null,
-        address: string | null,
-        phoneNumber: string | null,
-        createdAt: string,
-        updatedAt: string
-    }
-}
+  Response Data = {
+      account: {
+          id: string,
+          city: string,
+          address: string,
+          verifiedAt: string | null,
+          updateAt: string,
+          createdAt: string,
+          user: {
+              username: string,
+              status: string,
+              email: string,
+              phoneNumber: string | null,
+              image: string | null,
+          },
+          bank: {
+              bankName: string,
+              bankNumber: string,
+              ownerName: string
+          }
+      }
+  }
 
-fail:
-- seller tidak ditemukan
+  fail:
+  - seller tidak ditemukan
 
 
 Melakukan ban terhadap akun
-POST API/ADMIN/ACCOUNT/[id]/BAN
-id => userId
+  POST API/ADMIN/ACCOUNT/[id]/BAN
+  id => userId
 
-Response Message = "Berhasil melakukan ban terhadap akun"
+  Response Message = "Berhasil melakukan ban terhadap akun"
 
-fail:
-- Akun tidak ada
-- Akun sudah dibanned
+  fail:
+  - Akun tidak ada
+  - Akun sudah dibanned
 
 
-Melakukan unban terhadap akun
-POST API/ADMIN/ACCOUNT/[id]/UNBAN
-id => userId
+  Melakukan unban terhadap akun
+  POST API/ADMIN/ACCOUNT/[id]/UNBAN
+  id => userId
 
-Response Message = "Berhasil melakukan unban terhadap akun"
+  Response Message = "Berhasil melakukan unban terhadap akun"
 
-fail:
-- Akun tidak ada
-- Akun berstatus aktif
+  fail:
+  - Akun tidak ada
+  - Akun berstatus aktif
 
 
 Meverifikasi item seller
-POST API/ADMIN/ITEM/[id]/VERIFY
-id => itemId
+  POST API/ADMIN/ITEM/[id]/VERIFY
+  id => itemId
 
-Response Message = "Item berhasil di verifikasi"
+  Response Message = "Item berhasil di verifikasi"
 
-fail:
-- Item tidak ditemukan
-- Item sudah diverifikasi
+  fail:
+  - Item tidak ditemukan
+  - Item sudah diverifikasi
 
 
 Mendapatkan semua item
-GET API/ADMIN/ITEM?page=x&itemCount=x&search=x
+  GET API/ADMIN/ITEM?page=x&itemCount=x&search=x
 
-jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
-page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
-search -> berdasarkan username/email
+  jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
+  page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
+  search -> berdasarkan username/email
 
-Response Data = items: [
-    {
-        id: string,
-        title: string,
-        description: string,
-        image: string,
-        price: number,
-        stock: number,
-        verifiedAt: string,
-        createdAt: string,
-        updatedAt: string,
-        seller: {
-            id: string,
-            verifiedAt: string | null,
-            user: {
-                username: string,
-                email: string,
-                image: string | null,
-                status: string
-            }
-        }
-    },
-    { ... }
-]
+  Response Data = items: [
+      {
+          id: string,
+          title: string,
+          price: number,
+          stock: number,
+          verifiedAt: string,
+          createdAt: string,
+          updatedAt: string,
+          seller: {
+              id: string,
+              city: string,
+              verifiedAt: string | null,
+              user: {
+                  username: string,
+                  email: string,
+                  status: string
+              }
+          }
+      },
+      { ... }
+  ]
 
 
 Mendapatkan item by id
-GET API/ADMIN/ITEM/[id]
-id => itemId
+  GET API/ADMIN/ITEM/[id]
+  id => itemId
 
-Response Data = item: {
-    id: string,
-    title: string,
-    description: string,
-    image: string,
-    price: number,
-    stock: number,
-    verifiedAt: string,
-    createdAt: string,
-    updatedAt: string,
-    seller: {
-        id: string,
-        verifiedAt: string | null,
-        user: {
-            username: string,
-            email: string,
-            image: string | null,
-            status: string
-        }
-    }
-}
+  Response Data = item: {
+      id: string,
+      title: string,
+      description: string,
+      image: string,
+      price: number,
+      stock: number,
+      verifiedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      seller: {
+          id: string,
+          city: string,
+          address: string,
+          verifiedAt: string | null,
+          user: {
+              username: string,
+              email: string,
+              image: string | null,
+              status: string
+          }
+      }
+  }
 
-fail :
-- jika item tidak ditemukan
+  fail :
+  - jika item tidak ditemukan

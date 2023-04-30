@@ -55,20 +55,14 @@ export const getSellers = async ({ page, itemCount }: PaginationParams) => {
     take: itemCount,
     select: {
       id: true,
+      city: true,
       verifiedAt: true,
       createdAt: true,
       user: {
         select: {
-          id: true,
           username: true,
           status: true,
           email: true,
-          image: true,
-          address: true,
-          phoneNumber: true,
-          createdAt: true,
-          updatedAt: true,
-          password: false,
         }
       },
     },
@@ -86,21 +80,22 @@ export const getSellersBySearch = async (search: string, { page, itemCount }: Pa
     take: itemCount,
     select: {
       id: true,
+      city: true,
       verifiedAt: true,
       createdAt: true,
       user: {
         select: {
-          id: true,
           username: true,
           status: true,
           email: true,
-          image: true,
-          address: true,
-          phoneNumber: true,
-          createdAt: true,
-          updatedAt: true,
-          password: false,
         }
+      },
+    },
+    where: {
+      user: {
+        username: {
+          contains: search,
+        },
       },
     },
     orderBy: {
@@ -115,22 +110,27 @@ export const getSellerById = async (id: string) => {
   const account = await prisma.seller.findFirst({
     select: {
       id: true,
+      city: true,
+      address: true,
       verifiedAt: true,
+      updatedAt: true,
       createdAt: true,
       user: {
         select: {
-          id: true,
-          status: true,
           username: true,
+          status: true,
           email: true,
-          image: true,
-          address: true,
           phoneNumber: true,
-          createdAt: true,
-          updatedAt: true,
-          password: false,
+          image: true,
         }
       },
+      bank: {
+        select: {
+          bankName: true,
+          bankNumber: true,
+          ownerName: true,
+        }
+      }
     },
     where: {
       id

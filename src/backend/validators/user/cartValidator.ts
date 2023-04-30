@@ -4,7 +4,7 @@ import InvariantError from "@/backend/errors/InvariantError";
 export const validatePostCartPayload = (payload: any) => {
   const schema = Joi.object({
     itemId: Joi.string().required(),
-    amount: Joi.number().required(),
+    amount: Joi.number().min(1).required(),
   });
 
   const validationResult = schema.validate(payload);

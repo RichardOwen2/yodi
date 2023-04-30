@@ -45,8 +45,6 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
     select: {
       id: true,
       title: true,
-      description: true,
-      image: true,
       price: true,
       stock: true,
       verifiedAt: true,
@@ -55,12 +53,12 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
       seller: {
         select: {
           id: true,
+          city: true,
           verifiedAt: true,
           user: {
             select: {
               username: true,
               email: true,
-              image: true,
               status: true,
             }
           }
@@ -87,8 +85,6 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
     select: {
       id: true,
       title: true,
-      description: true,
-      image: true,
       price: true,
       stock: true,
       verifiedAt: true,
@@ -97,12 +93,12 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
       seller: {
         select: {
           id: true,
+          city: true,
           verifiedAt: true,
           user: {
             select: {
               username: true,
               email: true,
-              image: true,
               status: true,
             }
           }
@@ -135,6 +131,8 @@ export const getItemById = async (id: string) => {
       seller: {
         select: {
           id: true,
+          city: true,
+          address: true,
           verifiedAt: true,
           user: {
             select: {

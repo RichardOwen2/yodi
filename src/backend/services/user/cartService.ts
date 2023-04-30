@@ -6,7 +6,7 @@ import InvariantError from "@/backend/errors/InvariantError";
 import prisma from "@/backend/libs/prismadb"
 
 import { AccountStatus } from "@prisma/client";
-import { getItemById } from "../itemService";
+import { getItemStockById } from "../itemService";
 
 interface CartParams {
   userId: string;
@@ -26,6 +26,15 @@ const _checkIfCartExist = async ({ userId, itemId }: CartParams) => {
         select: {
           title: true,
           stock: true,
+          seller: {
+            select: {
+              user: {
+                select: {
+                  status: true,
+                },
+              },
+            },
+          },
         },
       },
       amount: true,
@@ -40,7 +49,7 @@ const _checkIfCartExist = async ({ userId, itemId }: CartParams) => {
 }
 
 export const addItemToCart = async ({ userId, itemId }: CartParams, amount: number) => {
-  const item = await getItemById(itemId);
+  const item = await getItemStockById(itemId);
 
   if (amount > item.stock) {
     throw new InvariantError("Stock item tidak cukup");
@@ -85,6 +94,7 @@ export const getCartItems = async (userId: string) => {
         select: {
           seller: {
             select: {
+              city: true,
               user: {
                 select: {
                   username: true,
@@ -121,6 +131,10 @@ export const changeAmountItemCart = async ({ userId, itemId }: CartParams, amoun
     return item.title;
   }
 
+  if (item.seller.user.status !== AccountStatus.ACTIVE) {
+    throw new InvariantError("Item tidak dapat diproses, karena seller terkena banned");
+  }
+
   const verify = await prisma.cart.update({
     where: {
       userId_itemId: {
@@ -129,7 +143,7 @@ export const changeAmountItemCart = async ({ userId, itemId }: CartParams, amoun
       },
     },
     data: {
-      amount
+      amount,
     },
     select: {
       id: true,
