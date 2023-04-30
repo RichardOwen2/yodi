@@ -42,14 +42,15 @@ model User {
   itemOrder   ItemOrder[]
   itemRequest ItemRequest[]
   item        Item[]
+  Cart        Cart[]
 }
 
 model Seller {
-  id         String         @id
-  userId     String         @unique
-  verifiedAt DateTime?      @map("verified_at")
-  createdAt  DateTime       @default(now()) @map("created_at")
-  updatedAt  DateTime       @updatedAt @map("updated_at")
+  id         String    @id
+  userId     String    @unique
+  verifiedAt DateTime? @map("verified_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   item        Item[]
@@ -80,8 +81,23 @@ model Item {
   seller Seller @relation(fields: [owner], references: [id], onDelete: Cascade)
 
   itemOrder ItemOrder[]
+  Cart      Cart[]
   user      User?       @relation(fields: [userId], references: [id])
   userId    String?
+}
+
+model Cart {
+  id        String   @id
+  userId    String   @map("user_id")
+  itemId    String   @map("item_id")
+  amount    Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
 }
 
 model ItemOrder {

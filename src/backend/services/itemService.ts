@@ -59,8 +59,13 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
     skip: itemCount * (page - 1),
     take: itemCount,
     where: {
-      verifiedAt: {
-        not: null,
+      seller: {
+        verifiedAt: {
+          not: null,
+        },
+        user: {
+          status: AccountStatus.ACTIVE,
+        }
       },
       title: {
         contains: search,
@@ -96,8 +101,13 @@ export const getItemById = async (itemId: string) => {
   const item = await prisma.item.findFirst({
     where: {
       id: itemId,
-      verifiedAt: {
-        not: null,
+      seller: {
+        verifiedAt: {
+          not: null,
+        },
+        user: {
+          status: AccountStatus.ACTIVE,
+        }
       },
     },
     select: {

@@ -22,6 +22,9 @@ export const verifySellerById = async (id: string) => {
     where: {
       id,
     },
+    select: {
+      verifiedAt: true,
+    },
   });
 
   if (!seller) {

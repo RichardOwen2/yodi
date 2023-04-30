@@ -144,6 +144,75 @@ fail:
 - Role akun bukan user
 
 
+Mendapatkan item di cart
+GET API/USER/CART
+
+Response Data = cart: [
+    {
+        item: {
+            seller: {
+                user: {
+                    username: string;
+                    image: string | null;
+                };
+            };
+            id: string;
+            image: string;
+            title: string;
+            description: string;
+            price: number;
+            stock: number;
+        };
+        amount: number;
+    },
+    { ... }
+]
+
+
+Menambahkan item di cart
+POST API/USER/CART
+
+Body Request = {
+  itemId: string,
+  amount: number
+}
+
+Response Message = `Berhasil menambahkan ${title} didalam cart`
+
+fail : 
+- Amount lebih besar dari stock item yang tersedia
+- Item tidak ditemukan
+
+
+Mengubah amount item di cart
+PUT API/USER/CART
+
+Body Request = {
+  itemId: string,
+  amount: number
+}
+
+Response Message = `Berhasil melakukan edit jumlah ${title} didalam cart`
+
+fail : 
+- Amount lebih besar dari stock item yang tersedia
+- Cart item tidak ditemukan
+- Jika mencoba update cart dengan amount yang sama, api akan ttp success tetapi tidak merubah database
+
+
+Menghapus item dalam cart
+DELETE API/USER/CART
+
+Body Request = {
+  amount: number
+}
+
+Response Message = `Berhasil menghapus ${title} didalam cart`
+
+fail :
+- item tidak ditemukan
+
+
 ------ SELLER ------
 
 Common fail :

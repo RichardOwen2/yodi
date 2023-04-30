@@ -27,6 +27,10 @@ const _verifyNewUsernameAndEmail = async (username: string, email: string) => {
         { email }
       ]
     },
+    select: {
+      username: true,
+      email: true,
+    },
   });
 
   if (user?.username === username) {
@@ -80,6 +84,10 @@ export const verifyUserCrendential = async ({ email, password }: verifyUserCrend
     where: {
       email,
     },
+    select: {
+      id: true,
+      password: true,
+    },
   });
 
   if (!user) {
@@ -104,6 +112,9 @@ export const getUserRoleById = async (id: string): Promise<UserRole> => {
     where: {
       userId: id
     },
+    select: {
+      id: true,
+    },
   });
 
   if (admin) {
@@ -113,6 +124,9 @@ export const getUserRoleById = async (id: string): Promise<UserRole> => {
   const seller = await prisma.seller.findUnique({
     where: {
       userId: id
+    },
+    select: {
+      id: true,
     },
   });
 
