@@ -94,7 +94,7 @@ Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh
   GET API/ITEM/[id]
 
   Response Data = {
-    items: {
+    item: {
         seller: {
           city: string,
           address: string,
