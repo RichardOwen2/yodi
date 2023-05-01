@@ -55,10 +55,28 @@ const _checkIfUserExistById = async (id: string) => {
     where: {
       id,
     },
+    select: {
+      id: true,
+    }
   });
 
   if (!user) {
     throw new InvariantError("User tidak ditemukan");
+  }
+}
+
+const _checkIfPhoneNumberExist = async (id: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      phoneNumber: true,
+    },
+  });
+
+  if (!user?.phoneNumber) {
+    throw new InvariantError("User tidak memiliki nomor telephone")
   }
 }
 
@@ -171,28 +189,6 @@ export const changeUserProfileById = async ({ }) => {
 
 }
 
-export const addUserPhotoProfileById = async ({ id, fileUrl }: { id: string; fileUrl: string; }) => {
-  await _checkIfUserExistById(id);
-
-  const user = await prisma.user.update({
-    where: {
-      id,
-    },
-    data: {
-      image: fileUrl,
-    },
-    select: {
-      image: true,
-    },
-  });
-
-  if (!user) {
-    throw new InvariantError("Gagal menambahkan photo profile");
-  }
-
-  return user;
-}
-
 export const upgradeRoleSellerById = async (
   userId: string,
   {
@@ -210,6 +206,8 @@ export const upgradeRoleSellerById = async (
   } else if (userRole !== UserRole.USER) {
     throw new InvariantError("Role akun bukan user!")
   }
+
+  await _checkIfPhoneNumberExist(userId);
 
   const id = `seller-${nanoid(16)}`;
 
