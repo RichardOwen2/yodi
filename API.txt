@@ -137,6 +137,22 @@ Mendapatkan data diri (khusus route ini bisa diakses bahkan jika user terbanned)
   }
 
 
+Melakukan edit/ Menambahkan data diri (username, phoneNumber, photoProfile)
+  PUT API/USER/ME
+
+  Request Body = {
+    username: string | undefined,
+    image: string | undefined,
+    phoneNumber: string | undefined,
+  }
+
+  - Semua key optional tetapi harus mengisikan salah satunya
+
+  fail:
+  - username sudah digunakan (jika mengisi username)
+  - phoneNumber berisikan value selain angka (angka bentuk string) (jika mengisi phoneNumber)
+
+
 Mengajukan diri menjadi seller
   POST API/USER/UPGRADE
 
@@ -153,6 +169,8 @@ Mengajukan diri menjadi seller
   fail:
   - Sudah pernah mengajukan diri
   - Role akun bukan user
+  - Bank Number minimal 8
+  - User belum menambahkan nomor telephone
 
 
 Mendapatkan item di cart
@@ -260,6 +278,7 @@ Mendapatkan list item checkout/order
       },
       { ... }
   ]
+
 
 Melakukan checkout/order item
   POST API/USER/ORDER
