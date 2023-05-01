@@ -84,17 +84,42 @@ model Item {
   description String
   image       String
   price       Int
-  stock       Int
+  sold        Int
   verifiedAt  DateTime? @map("verified_at")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
   seller Seller @relation(fields: [owner], references: [id], onDelete: Cascade)
 
-  itemOrder ItemOrder[]
-  Cart      Cart[]
-  user      User?       @relation(fields: [userId], references: [id])
-  userId    String?
+  itemOrder   ItemOrder[]
+  Cart        Cart[]
+  user        User?         @relation(fields: [userId], references: [id])
+  userId      String?
+  ItemVariant ItemVariant[]
+  ItemImage   ItemImage[]
+}
+
+model ItemImage {
+  id     String @id
+  itemId String @map("item_id")
+  image  String
+
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model ItemVariant {
+  id        String   @id
+  itemId    String
+  label     String
+  price     Int
+  stock     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  item             Item               @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  ItemOrderVariant ItemOrderVariant[]
+
+  @@map("item_variant")
 }
 
 model Cart {
@@ -123,9 +148,24 @@ model ItemOrder {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
-  ItemOrderStatus ItemOrderStatus[]
+  ItemOrderStatus  ItemOrderStatus[]
+  ItemOrderVariant ItemOrderVariant[]
 
   @@map("item_order")
+}
+
+model ItemOrderVariant {
+  id            String   @id
+  itemOrderId   String   @map("item_order_id")
+  itemVariantId String   @map("item_variant_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  itemOrder   ItemOrder   @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
+  itemVariant ItemVariant @relation(fields: [itemVariantId], references: [id], onDelete: Cascade)
+
+  @@unique([itemOrderId, itemVariantId])
+  @@map("item_order_variant")
 }
 
 model ItemOrderStatus {
