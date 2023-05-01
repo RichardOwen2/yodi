@@ -264,6 +264,13 @@ Mendapatkan list item checkout/order
       {
           price: number,
           amount: number,
+          ItemOrderStatus: [
+              {
+                  status: string (enum),
+                  createdAt: string
+              },
+              { ... }
+          ],
           item: {
               title: string,
               image: string,

@@ -5,6 +5,7 @@ import InvariantError from "@/backend/errors/InvariantError";
 
 import prisma from "@/backend/libs/prismadb"
 import { PaginationParams } from "@/types";
+import { ItemStatus } from "@prisma/client";
 
 import { getItemStockById } from "../itemService";
 import { takeStockFromItem } from "./itemService";
@@ -23,15 +24,22 @@ export const orderItem = async ({ userId, itemId }: OrderParams, amount: number)
 
   await takeStockFromItem(itemId, amount);
 
-  const id = `itemOrder-${nanoid(16)}`;
+  const orderId = `itemOrder-${nanoid(16)}`;
+  const statusId = `itemOrderStatus-${nanoid(16)}`
 
   const order = await prisma.itemOrder.create({
     data: {
-      id,
+      id: orderId,
       userId,
       itemId,
       amount,
       price,
+      ItemOrderStatus: {
+        create: {
+          id: statusId,
+          status: ItemStatus.PAYMENT,
+        }
+      }
     },
     select: {
       id: true,
@@ -61,6 +69,15 @@ export const getOrders = async (userId: string, { page, itemCount }: PaginationP
     select: {
       price: true,
       amount: true,
+      ItemOrderStatus: {
+        select: {
+          status: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
       item: {
         select: {
           title: true,
@@ -103,6 +120,15 @@ export const getOrdersBySearch = async (userId: string, search: string, { page, 
     select: {
       price: true,
       amount: true,
+      ItemOrderStatus: {
+        select: {
+          status: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
       item: {
         select: {
           title: true,
