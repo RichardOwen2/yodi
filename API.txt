@@ -322,7 +322,7 @@ Mendapatkan data diri akun seller (khusus route ini bisa diakses bahkan jika use
 
 
 Mengajukan Item Penjualan
-  POST API/SELLER/ITEM/SUBMIT
+  POST API/SELLER/ITEM
 
   Body Request : {
     title: string,
