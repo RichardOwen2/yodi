@@ -40,7 +40,6 @@ model User {
   admin       Admin?
   itemOrder   ItemOrder[]
   itemRequest ItemRequest[]
-  item        Item[]
   Cart        Cart[]
 }
 
@@ -57,6 +56,7 @@ model Seller {
   item        Item[]
   ItemRequest ItemRequest[]
   bank        Bank?
+  ItemOrder   ItemOrder[]
 }
 
 model Bank {
@@ -82,29 +82,26 @@ model Item {
   owner       String
   title       String
   description String
-  image       String
-  price       Int
-  sold        Int
+  sold        Int       @default(0)
   verifiedAt  DateTime? @map("verified_at")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
   seller Seller @relation(fields: [owner], references: [id], onDelete: Cascade)
 
-  itemOrder   ItemOrder[]
-  Cart        Cart[]
-  user        User?         @relation(fields: [userId], references: [id])
-  userId      String?
-  ItemVariant ItemVariant[]
-  ItemImage   ItemImage[]
+  cart        Cart[]
+  itemVariant ItemVariant[]
+  itemImage   ItemImage[]
 }
 
 model ItemImage {
-  id     String @id
+  id     Int    @id @default(autoincrement())
   itemId String @map("item_id")
   image  String
 
   item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("item_image")
 }
 
 model ItemVariant {
@@ -116,8 +113,8 @@ model ItemVariant {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  item             Item               @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  ItemOrderVariant ItemOrderVariant[]
+  item        Item          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  cartVariant CartVariant[]
 
   @@map("item_variant")
 }
@@ -126,45 +123,73 @@ model Cart {
   id        String   @id
   userId    String   @map("user_id")
   itemId    String   @map("item_id")
-  amount    Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item        Item          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  cartVariant CartVariant[]
 
   @@unique([userId, itemId])
 }
 
+model CartVariant {
+  id            String   @id
+  cartId        String   @map("cart_id")
+  itemVariantId String   @map("item_variant_id")
+  amount        Int
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  cart        Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  itemVariant ItemVariant @relation(fields: [itemVariantId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, itemVariantId])
+  @@map("cart_variant")
+}
+
 model ItemOrder {
-  id        String   @id
-  userId    String   @map("user_id")
-  itemId    String   @map("item_id")
-  price     Int
-  amount    Int
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String   @id
+  userId      String   @map("user_id")
+  sellerId    String   @map("seller_id")
+  title       String
+  description String
+  price       Int
+  amount      Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seller Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  ItemOrderStatus  ItemOrderStatus[]
-  ItemOrderVariant ItemOrderVariant[]
+  itemOrderStatus  ItemOrderStatus[]
+  itemOrderVariant ItemOrderVariant[]
+  itemOrderImage   ItemOrderImage[]
 
   @@map("item_order")
 }
 
+model ItemOrderImage {
+  id      Int    @id @default(autoincrement())
+  orderId String @map("order_id")
+  image   String
+
+  itemOrder ItemOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("item_order_image")
+}
+
 model ItemOrderVariant {
-  id            String   @id
-  itemOrderId   String   @map("item_order_id")
-  itemVariantId String   @map("item_variant_id")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id          String   @id
+  itemOrderId String   @map("item_order_id")
+  label       String
+  amount      Int
+  price       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  itemOrder   ItemOrder   @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
-  itemVariant ItemVariant @relation(fields: [itemVariantId], references: [id], onDelete: Cascade)
+  itemOrder ItemOrder @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
 
-  @@unique([itemOrderId, itemVariantId])
   @@map("item_order_variant")
 }
 

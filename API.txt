@@ -6,17 +6,22 @@ Success => {
   status: "success",
   data: (if data exist),
   message: (if message exist),
-}
+} // Response code 200, 201
 
 Fail => {
   status: "fail",
   message: errorMessage
-}
+} // Response code 400, 401, 403, 404
 
 Error => {
   status: 'error',
-  message: 'terjadi kesalahan pada server kami',
-}
+  message: 'Terjadi kesalahan pada server kami',
+} // Response code 500
+
+Database Error => {
+  status: 'error',
+  message: 'Database service unavailable',
+} // Response code 503
 
 ------ GUEST ------
 
@@ -65,24 +70,36 @@ Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin
   search -> berdasarkan title
 
   Response Data = {
-      "items": [
-          {
-              seller: {
-                city: string,
-                  user: {
-                      username: string,
-                      image: string | null
-                  }
-              },
-              id: string,
-              title: string,
-              description: string,
-              image: string,
-              price: number,
-              stock: number
-          },
-          { ... }
-      ]
+      items: [
+            {
+                seller: {
+                    city: string,
+                    user: {
+                        username: string,
+                        image: string | null
+                    }
+                },
+                id: string,
+                title: string,
+                description: string,
+                sold: number,
+                itemImage: [
+                    {
+                        image: string
+                    }, // hanya 1
+                ],
+                itemVariant: [
+                    {
+                        price: number
+                    },
+                    { ... }
+                ],
+                _count: {
+                    itemVariant: number
+                }
+            },
+            { ... }
+        ]
   }
 
   fail :
@@ -95,21 +112,32 @@ Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh
 
   Response Data = {
     item: {
-        seller: {
-          city: string,
-          address: string,
-            user: {
-                username: string,
-                image: string | null
-            }
-        },
-        id: string,
-        title: string,
-        description: string,
-        image: string,
-        price: number,
-        stock: number
-    },
+            seller: {
+                city: string,
+                user: {
+                    username: string,
+                    image: string | null
+                }
+            },
+            id: string,
+            title: string,
+            description: string,
+            sold: number,
+            itemImage: [
+                {
+                    image: string
+                },
+                { ... }
+            ],
+            itemVariant: [
+                {
+                    label: string,
+                    price: number,
+                    stock: number
+                },
+                { ... }
+            ],
+        }
   }
 
   fail:
@@ -129,11 +157,11 @@ Mendapatkan data diri (khusus route ini bisa diakses bahkan jika user terbanned)
 
   Response Data = {
     username: string,
-    status: string,
+    status: enum(ACTIVE/BANNED),
     email: string,
     image: string,
-    createdAt: string,
-    updatedAt: string,
+    createdAt: Date,
+    updatedAt: Date,
   }
 
 
@@ -176,24 +204,33 @@ Mengajukan diri menjadi seller
 Mendapatkan item di cart
   GET API/USER/CART
 
-  Response Data = cart: [
+  Response Data = 
+  cart: [
       {
           item: {
+              title: dwada,
               seller: {
-                  city: string,
+                  city: aa,
                   user: {
-                      username: string,
-                      image: string | null,
-                  },
+                      image: null
+                  }
               },
-              id: string,
-              image: string,
-              title: string,
-              description: string,
-              price: number,
-              stock: number,
+              itemImage: [
+                  {
+                      image: a
+                  }, // hanya 1
+              ]
           },
-          amount: number,
+          cartVariant: [
+              {
+                  amount: number,
+                  itemVariant: {
+                      label: string,
+                      price: number
+                  }
+              },
+              { ... }
+          ]
       },
       { ... }
   ]
@@ -206,7 +243,13 @@ Menambahkan item di cart
 
   Body Request = {
     itemId: string,
-    amount: number
+    itemVariant: [
+      {
+        id: string ( id => itemVariantId),
+        amount: number
+      },
+      { ... }
+    ]
   }
 
   Response Message = `Berhasil menambahkan ${title} didalam cart`
@@ -222,8 +265,14 @@ Mengubah amount item di cart
   PUT API/USER/CART
 
   Body Request = {
-    itemId: string,
-    amount: number
+    cartId: string,
+    itemVariant: [
+      {
+        id: string ( id => itemVariantId),
+        amount: number
+      },
+      { ... }
+    ]
   }
 
   Response Message = `Berhasil melakukan edit jumlah ${title} didalam cart`
@@ -236,11 +285,12 @@ Mengubah amount item di cart
   - Seller terbanned
 
 
-Menghapus item dalam cart
+Menghapus itemVariant dalam cart
   DELETE API/USER/CART
 
   Body Request = {
-    amount: number
+    cartId: true,
+    cartVariant: true
   }
 
   Response Message = `Berhasil menghapus ${title} didalam cart`
@@ -251,6 +301,7 @@ Menghapus item dalam cart
   
   note :
   - dapat dihapus meskipun seller terbanned
+  - jika semua variant item dihapus maka cart terhapus otomatis
 
 
 Mendapatkan list item checkout/order
@@ -262,37 +313,52 @@ Mendapatkan list item checkout/order
 
   Response Data = orders: [
       {
-          price: number,
+          title: string,
+          price: number (generate otomatis sebagai total harga),
           amount: number,
-          ItemOrderStatus: [
+          createdAt: Date,
+          itemOrderVariant: [
               {
-                  status: string (enum),
-                  createdAt: string
+                  label: string,
+                  amount: number,
+                  price: number
               },
               { ... }
           ],
-          item: {
-              title: string,
-              image: string,
-              seller: {
-                  city: string,
-                  user: {
-                      username: string,
-                      phoneNumber: string
-                  }
+          itemOrderStatus: [
+              {
+                  status: PAYMENT (default),
+                  createdAt: Date
+              }
+          ],
+          itemOrderImage: [
+              {
+                  image: string
+              } // hanya 1
+          ],
+          seller: {
+              city: aa,
+              user: {
+                  username: string,
+                  image: string | null
               }
           }
       },
       { ... }
   ]
 
-
 Melakukan checkout/order item
   POST API/USER/ORDER
 
   Body Request = {
     itemId: string,
-    amount: number
+    itemVariant: [
+      {
+        id: string, (id => itemVariantId)
+        amount: number
+      },
+      { ... }
+    ]
   }
 
   Response Message = `Berhasil melakukan checkout ${title}`
@@ -320,8 +386,8 @@ Mendapatkan data diri akun seller (khusus route ini bisa diakses bahkan jika use
       id: string,
       userId: string,
       verifiedAt: string,
-      createdAt: string,
-      updatedAt: string
+      createdAt: Date,
+      updatedAt: Date
   }
 
   fail :
@@ -334,9 +400,17 @@ Mengajukan Item Penjualan
   Body Request : {
     title: string,
     description: string | undefined,
-    image: string,
-    price: number,
-    stock: number,
+    images: [
+        string, ...
+    ],
+    itemVariant: [
+        {
+            label: string,
+            price: number > 1000,
+            stock: number > 1
+        },
+        { ... }
+    ]
   }
 
   Response Message = "Berhasil mengajukan item penjualan"
@@ -351,21 +425,25 @@ Mendapatkan list semua item yang diajukan
 
   Response Data = {
     items: [
-        {
-            id: string,
-            title: string,
-            description: string (default = ""),
-            image: string,
-            price: number,
-            stock: number,
-            verifiedAt: string | null, //null jika belum di verifikasi admin
-            createdAt: string,
-            updatedAt: string,
-        },
-        {
-          ...
-        }
-    ]
+            {
+                id: string,
+                title: string,
+                description: string,
+                verifiedAt: Date | null,
+                createdAt: Date,
+                updatedAt: Date,
+                itemImage: [
+                    {
+                        image: string,
+                    }, // hanya menampilkan 1
+                ],
+                _count: {
+                    itemVariant: number,
+                    cart: number
+                }
+            },
+            { ... }
+        ]
   }
 
   fail :
@@ -378,17 +456,28 @@ Mendapatkan Item by Id
   id => itemId
 
   Response Data = {
-    items: {
-        id: string,
-        title: string,
-        description: string (default = ""),
-        image: string,
-        price: number,
-        stock: number,
-        verifiedAt: string | null, //null jika belum di verifikasi admin
-        createdAt: string,
-        updatedAt: string,
-    },
+    item: {
+            id: item-8bb_iUOhAfR-V9Qq,
+            title: wa2,
+            description: dwa,
+            verifiedAt: Date | null,
+            createdAt: Date,
+            updatedAt: Date,
+            itemImage: [
+                {
+                    image: string
+                },
+                { ... }
+            ],
+            itemVariant: [
+                {
+                    label: string,
+                    price: number,
+                    stock: number
+                },
+                { ... }
+            ]
+      }
   }
 
   fail :
@@ -404,21 +493,25 @@ Mendapatkan list semua item yang sudah diverifikasi
 
   Response Data = {
     items: [
-        {
-            id: string,
-            title: string,
-            description: string (default = ""),
-            image: string,
-            price: number,
-            stock: number,
-            verifiedAt: string,
-            createdAt: string,
-            updatedAt: string,
-        },
-        {
-          ...
-        }
-    ]
+            {
+                id: string,
+                title: string,
+                description: string,
+                verifiedAt: Date,
+                createdAt: Date,
+                updatedAt: Date,
+                itemImage: [
+                    {
+                        image: string,
+                    }, // hanya menampilkan 1
+                ],
+                _count: {
+                    itemVariant: number,
+                    cart: number
+                }
+            },
+            { ... }
+        ]
   }
 
   fail :
@@ -455,12 +548,12 @@ Mendapatkan semua akun
       {
           id: string,
           username: string,
-          status: string | null,
+          status: enum(ACTIVE/BANNED),
           email: string,
           image: string | null,
           phoneNumber: string | null,
-          createdAt: string,
-          updatedAt: string,
+          createdAt: Date,
+          updatedAt: Date,
           seller: {
               id: string,
               verifiedAt: string | null,
@@ -477,15 +570,15 @@ Mendapatkan akun by id
   Response Data = accounts: {
       id: string,
       username: string,
-      status: string | null,
+      status: enum(ACTIVE/BANNED),
       email: string,
       image: string | null,
       phoneNumber: string | null,
-      createdAt: string,
-      updatedAt: string,
+      createdAt: Date,
+      updatedAt: Date,
       seller: {
           id: string,
-          verifiedAt: string | null,
+          verifiedAt: Date | null,
       } | null
   }
 
@@ -502,10 +595,10 @@ Mendapatkan semua akun seller
           id: string,
           city: string,
           verifiedAt: string | null,
-          createdAt: string,
+          createdAt: Date,
           user: {
               username: string,
-              status: string,
+              status: enum(ACTIVE/BANNED),
               email: string,
           }
       },
@@ -523,11 +616,11 @@ Mendapatkan akun seller by id
           city: string,
           address: string,
           verifiedAt: string | null,
-          updateAt: string,
-          createdAt: string,
+          updateAt: Date,
+          createdAt: Date,
           user: {
               username: string,
-              status: string,
+              status: enum(ACTIVE/BANNED),
               email: string,
               phoneNumber: string | null,
               image: string | null,
@@ -584,56 +677,75 @@ Mendapatkan semua item
   page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
   search -> berdasarkan username/email
 
-  Response Data = items: [
-      {
-          id: string,
-          title: string,
-          price: number,
-          stock: number,
-          verifiedAt: string,
-          createdAt: string,
-          updatedAt: string,
-          seller: {
-              id: string,
-              city: string,
-              verifiedAt: string | null,
-              user: {
-                  username: string,
-                  email: string,
-                  status: string
-              }
-          }
-      },
-      { ... }
-  ]
+  Response Data = {
+    items: [
+            {
+                id: string,
+                title: string,
+                verifiedAt: Date | null,
+                createdAt: Date,
+                updatedAt: Date,
+                itemImage: [
+                    {
+                        image: string,
+                    },
+                    { ... }
+                ],
+                seller: {
+                    id: string,
+                    city: string,
+                    verifiedAt: Date,
+                    user: {
+                        username: string,
+                        email: string,
+                        status: enum(ACTIVE/BANNED)
+                    }
+                },
+                _count: {
+                    itemVariant: number
+                }
+            },
+            { ... }
+      ]
+  }
 
 
 Mendapatkan item by id
   GET API/ADMIN/ITEM/[id]
   id => itemId
 
-  Response Data = item: {
-      id: string,
-      title: string,
-      description: string,
-      image: string,
-      price: number,
-      stock: number,
-      verifiedAt: string,
-      createdAt: string,
-      updatedAt: string,
-      seller: {
-          id: string,
-          city: string,
-          address: string,
-          verifiedAt: string | null,
-          user: {
-              username: string,
-              email: string,
-              image: string | null,
-              status: string
-          }
-      }
+  Response Data = {
+    item: {
+            id: string,
+            title: string,
+            verifiedAt: Date | null,
+            createdAt: Date,
+            updatedAt: Date,
+            itemImage: [
+                {
+                    image: string
+                },
+                { ... }
+            ],
+            seller: {
+                id: string,
+                city: string,
+                verifiedAt: Date | null,
+                user: {
+                    username: string,
+                    email: string,
+                    status: enum(ACTIVE/BANNED)
+                }
+            },
+            itemVariant: [
+                {
+                    label: string,
+                    price: number,
+                    stock: number
+                },
+                { ... }
+            ]
+        }
   }
 
   fail :

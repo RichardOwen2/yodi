@@ -2,67 +2,110 @@ import { nanoid } from "nanoid";
 
 import NotFoundError from "@/backend/errors/NotFoundError";
 import InvariantError from "@/backend/errors/InvariantError";
+import AuthorizationError from "@/backend/errors/AuthorizationError";
 
 import prisma from "@/backend/libs/prismadb"
 
 import { AccountStatus } from "@prisma/client";
-import { getItemStockById } from "../itemService";
+import { checkIfTheItemAvailable, getItemVariantStockById } from "../itemService";
 
 interface CartParams {
-  userId: string;
   itemId: string;
+  itemVariant: {
+    id: string,
+    amount: number,
+  }[];
 }
 
-const _checkIfCartExist = async ({ userId, itemId }: CartParams) => {
-  const cart = await prisma.cart.findUnique({
+interface ChangeCartParams {
+  cartId: string;
+  itemVariant: {
+    id: string;
+    amount: number;
+  }[];
+}
+
+interface DeleteCartParams {
+  cartId: string;
+  cartVariantId: string;
+}
+
+const _verifyCartAccess = async ({ userId, cartId }: { userId: string, cartId: string }) => {
+  const cart = await prisma.cart.findFirst({
     where: {
-      userId_itemId: {
-        userId,
-        itemId,
-      },
+      id: cartId,
     },
     select: {
+      userId: true,
       item: {
         select: {
-          title: true,
-          stock: true,
-          seller: {
-            select: {
-              user: {
-                select: {
-                  status: true,
-                },
-              },
-            },
-          },
+          id: true,
         },
       },
-      amount: true,
     },
   });
 
   if (!cart) {
-    throw new NotFoundError("Gagal melakukan update, item tidak ditemukan");
+    throw new NotFoundError("Cart tidak ditemukan");
   }
 
-  return cart;
+  if (cart.userId !== userId) {
+    throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
+  }
+
+  return cart.item.id;
 }
 
-export const addItemToCart = async ({ userId, itemId }: CartParams, amount: number) => {
-  const item = await getItemStockById(itemId);
+const _checkIfVariantExist = async (cartId: string) => {
+  const variant = await prisma.cartVariant.findFirst({
+    where: {
+      cartId,
+    },
+  });
 
-  if (amount > item.stock) {
-    throw new InvariantError("Stock item tidak cukup");
+  if (!variant) {
+    await prisma.cart.delete({
+      where: {
+        id: cartId,
+      },
+    });
   }
+}
 
-  const id = `cart-${nanoid(16)}`;
+export const addItemToCart = async (userId: string, { itemId, itemVariant }: CartParams) => {
+  const title = await checkIfTheItemAvailable(itemId);
+
+  const cartId = `cart-${nanoid(16)}`;
+
+  const cartVariantData = await Promise.all(itemVariant.map(async ({ id, amount }) => {
+    const { stock, label } = await getItemVariantStockById(itemId, id);
+
+    if (amount > stock) {
+      throw new InvariantError(`Stock item variant ${label} tidak cukup`);
+    }
+
+    const cartVariantId = `cartVariant-${nanoid(16)}`;
+
+    return {
+      id: cartVariantId,
+      itemVariantId: id,
+      amount,
+    };
+  }));
 
   const cart = await prisma.cart.create({
     data: {
-      id,
+      id: cartId,
       userId,
       itemId,
-      amount
+      cartVariant: {
+        createMany: {
+          data: cartVariantData,
+        },
+      },
+    },
+    select: {
+      id: true,
     },
   });
 
@@ -70,7 +113,7 @@ export const addItemToCart = async ({ userId, itemId }: CartParams, amount: numb
     throw new InvariantError("Gagal menambahkan item di keranjang");
   }
 
-  return item.title;
+  return title;
 }
 
 export const getCartItems = async (userId: string) => {
@@ -89,28 +132,38 @@ export const getCartItems = async (userId: string) => {
       }
     },
     select: {
-      amount: true,
       item: {
         select: {
+          title: true,
           seller: {
             select: {
               city: true,
               user: {
                 select: {
-                  username: true,
                   image: true,
-                }
-              }
+                },
+              },
             },
           },
-          id: true,
-          title: true,
-          description: true,
-          image: true,
-          price: true,
-          stock: true,
+          itemImage: {
+            take: 1,
+            select: {
+              image: true,
+            },
+          },
         },
-      }
+      },
+      cartVariant: {
+        select: {
+          amount: true,
+          itemVariant: {
+            select: {
+              label: true,
+              price: true
+            },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -120,65 +173,63 @@ export const getCartItems = async (userId: string) => {
   return items;
 }
 
-export const changeAmountItemCart = async ({ userId, itemId }: CartParams, amount: number) => {
-  const { amount: cartAmount, item } = await _checkIfCartExist({ userId, itemId });
+export const changeAmountItemCartVariant = async (userId: string, { cartId, itemVariant }: ChangeCartParams) => {
+  const itemId = await _verifyCartAccess({ userId, cartId });
 
-  if (amount > item.stock) {
-    throw new InvariantError("Stock item tidak cukup");
-  }
+  const cartVariantData = await Promise.all(itemVariant.map(async ({ id, amount }) => {
+    const { stock, label } = await getItemVariantStockById(itemId, id);
 
-  if (cartAmount === amount) {
-    return item.title;
-  }
+    if (amount > stock) {
+      throw new InvariantError(`Stock item variant ${label} tidak cukup`);
+    }
 
-  if (item.seller.user.status !== AccountStatus.ACTIVE) {
-    throw new InvariantError("Item tidak dapat diproses, karena seller terkena banned");
-  }
-
-  const verify = await prisma.cart.update({
-    where: {
-      userId_itemId: {
-        userId,
-        itemId,
+    return {
+      where: {
+        itemVariantId: id,
       },
+      data: {
+        amount,
+      },
+    };
+  }));
+
+  const cart = await prisma.cart.update({
+    where: {
+      id: cartId,
     },
     data: {
-      amount,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!verify) {
-    throw new InvariantError("Gagal melakukan update jumlah barang");
-  }
-
-  return item.title;
-}
-
-export const deleteItemOnCart = async ({ userId, itemId }: CartParams) => {
-  const cart = await _checkIfCartExist({ userId, itemId });
-
-  if (!cart) {
-    throw new NotFoundError("Item cart tidak ditemukan");
-  }
-
-  const verify = await prisma.cart.delete({
-    where: {
-      userId_itemId: {
-        userId,
-        itemId,
+      cartVariant: {
+        updateMany: cartVariantData,
       },
     },
+  });
+
+  if (!cart) {
+    throw new InvariantError("Gagal melakukan update cart");
+  }
+}
+
+export const deleteItemVariantOnCart = async (userId: string, { cartId, cartVariantId }: DeleteCartParams) => {
+  await _verifyCartAccess({ userId, cartId });
+
+  const cart = await prisma.cartVariant.delete({
+    where: {
+      id: cartVariantId,
+    },
     select: {
-      id: true,
+      itemVariant: {
+        select: {
+          label: true,
+        }
+      }
     },
   });
 
-  if (!verify) {
+  if (!cart) {
     throw new InvariantError("Gagal menghapus item dalam cart");
   }
 
-  return cart.item.title;
+  await _checkIfVariantExist(cartId);
+
+  return cart.itemVariant.label;
 }

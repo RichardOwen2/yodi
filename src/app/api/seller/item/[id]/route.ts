@@ -4,7 +4,7 @@ import getTokenHandler from "@/backend/utils/getTokenHandler";
 import errorHandler from "@/backend/utils/errorHandler";
 
 import verifySellerAccess from "@/backend/services/seller";
-import { getItemsByIdandSeller } from "@/backend/services/seller/itemService";
+import { getItemByIdandSeller } from "@/backend/services/seller/itemService";
 
 interface Params {
   params: {
@@ -17,7 +17,7 @@ export async function GET(request: Request, { params: { id } }: Params) {
     const userId = getTokenHandler(request);
     await verifySellerAccess(userId);
 
-    const item = await getItemsByIdandSeller(userId, id);
+    const item = await getItemByIdandSeller(userId, id);
 
     return NextResponse.json({
       status: "success",

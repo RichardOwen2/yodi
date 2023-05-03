@@ -10,9 +10,13 @@ import type { PaginationParams } from "@/types";
 interface addItemParams {
   title: string;
   description: string;
-  image: string;
+  images: string[];
   price: number;
-  stock: number;
+  itemVariant: {
+    label: string,
+    price: number,
+    stock: number,
+  }[];
 }
 
 export const addItem = async (
@@ -20,9 +24,8 @@ export const addItem = async (
   {
     title,
     description,
-    image,
-    price,
-    stock
+    images,
+    itemVariant,
   }: addItemParams
 ) => {
   const id = `item-${nanoid(16)}`
@@ -40,15 +43,37 @@ export const addItem = async (
     throw new InvariantError("Item gagal ditambahkan");
   }
 
+  const imageData = images.map((image) => {
+    return {
+      image
+    };
+  });
+
+  const itemVariantData = itemVariant.map((item) => {
+    const id = `itemVariant-${nanoid(16)}`;
+
+    return {
+      ...item,
+      id,
+    }
+  });
+
   const item = await prisma.item.create({
     data: {
       id,
       owner: seller.id,
       title,
       description,
-      image,
-      price,
-      stock,
+      itemImage: {
+        createMany: {
+          data: imageData,
+        },
+      },
+      itemVariant: {
+        createMany: {
+          data: itemVariantData,
+        },
+      },
     },
     select: {
       id: true,
@@ -79,12 +104,21 @@ export const getItemsBySeller = async (userId: string, { page, itemCount }: Pagi
       id: true,
       title: true,
       description: true,
-      image: true,
-      price: true,
-      stock: true,
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
+      itemImage: {
+        take: 1,
+        select: {
+          image: true,
+        },
+      },
+      _count: {
+        select: {
+          itemVariant: true,
+          cart: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -106,7 +140,7 @@ export const getVerifiedItemsBySeller = async (userId: string, { page, itemCount
       seller: {
         user: {
           id: userId
-        }
+        },
       },
       verifiedAt: {
         not: null,
@@ -116,12 +150,21 @@ export const getVerifiedItemsBySeller = async (userId: string, { page, itemCount
       id: true,
       title: true,
       description: true,
-      image: true,
-      price: true,
-      stock: true,
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
+      itemImage: {
+        take: 1,
+        select: {
+          image: true,
+        },
+      },
+      _count: {
+        select: {
+          itemVariant: true,
+          cart: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -131,7 +174,7 @@ export const getVerifiedItemsBySeller = async (userId: string, { page, itemCount
   return items;
 }
 
-export const getItemsByIdandSeller = async (userId: string, itemId: string) => {
+export const getItemByIdandSeller = async (userId: string, itemId: string) => {
   const item = await prisma.item.findFirst({
     where: {
       seller: {
@@ -145,12 +188,21 @@ export const getItemsByIdandSeller = async (userId: string, itemId: string) => {
       id: true,
       title: true,
       description: true,
-      image: true,
-      price: true,
-      stock: true,
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
+      itemImage: {
+        select: {
+          image: true,
+        },
+      },
+      itemVariant: {
+        select: {
+          label: true,
+          price: true,
+          stock: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',

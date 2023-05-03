@@ -58,15 +58,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     validatePostItemPayload(body);
 
-    const {
-      title,
-      description = "",
-      image,
-      price,
-      stock,
-    } = body;
-
-    await addItem(userId, { title, description, image, price, stock });
+    await addItem(userId, body);
 
     return NextResponse.json({
       status: "success",
