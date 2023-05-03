@@ -12,9 +12,7 @@ export async function POST(request: Request) {
 
     validatePostLoginPayload(body);
 
-    const { email, password } = body;
-
-    const id = await verifyUserCrendential({ email, password });
+    const id = await verifyUserCrendential(body);
     const token = generateToken(id);
 
     return NextResponse.json({

@@ -22,7 +22,10 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
         user: {
           status: AccountStatus.ACTIVE,
         }
-      }
+      },
+      verifiedAt: {
+        not: null,
+      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -42,9 +45,23 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
       id: true,
       title: true,
       description: true,
-      image: true,
-      price: true,
-      stock: true,
+      sold: true,
+      itemImage: {
+        take: 1,
+        select: {
+          image: true,
+        },
+      },
+      itemVariant: {
+        select: {
+          price: true,
+        },
+      },
+      _count: {
+        select: {
+          itemVariant: true,
+        },
+      },
     },
   });
 
@@ -68,6 +85,9 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
           status: AccountStatus.ACTIVE,
         }
       },
+      verifiedAt: {
+        not: null,
+      },
       title: {
         contains: search,
       },
@@ -90,9 +110,23 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
       id: true,
       title: true,
       description: true,
-      image: true,
-      price: true,
-      stock: true,
+      sold: true,
+      itemImage: {
+        take: 1,
+        select: {
+          image: true,
+        },
+      },
+      itemVariant: {
+        select: {
+          price: true,
+        },
+      },
+      _count: {
+        select: {
+          itemVariant: true,
+        },
+      },
     },
   });
 
@@ -116,7 +150,6 @@ export const getItemById = async (itemId: string) => {
       seller: {
         select: {
           city: true,
-          address: true,
           user: {
             select: {
               username: true,
@@ -128,9 +161,19 @@ export const getItemById = async (itemId: string) => {
       id: true,
       title: true,
       description: true,
-      image: true,
-      price: true,
-      stock: true,
+      sold: true,
+      itemImage: {
+        select: {
+          image: true,
+        },
+      },
+      itemVariant: {
+        select: {
+          label: true,
+          price: true,
+          stock: true,
+        },
+      },
     },
   });
 
@@ -141,8 +184,8 @@ export const getItemById = async (itemId: string) => {
   return item;
 }
 
-export const getItemStockById = async (itemId: string) => {
-  const stock = await prisma.item.findFirst({
+export const checkIfTheItemAvailable = async (itemId: string) => {
+  const item = await prisma.item.findFirst({
     where: {
       id: itemId,
       seller: {
@@ -151,11 +194,50 @@ export const getItemStockById = async (itemId: string) => {
         },
         user: {
           status: AccountStatus.ACTIVE,
-        }
+        },
+      },
+      verifiedAt: {
+        not: null,
       },
     },
     select: {
+      itemImage: {
+        select: {
+          image: true,
+        }
+      },
+      seller: {
+        select: {
+          id: true,
+        }
+      },
       title: true,
+      description: true,
+    },
+  });
+
+  if (!item) {
+    throw new InvariantError("Item tidak ditemukan/tersedia");
+  }
+
+  return {
+    itemImage: item.itemImage,
+    title: item.title,
+    description: item.description,
+    sellerId: item.seller.id,
+  };
+}
+
+export const getItemVariantStockById = async (itemId: string, itemVariantId: string) => {
+  const stock = await prisma.itemVariant.findFirst({
+    where: {
+      id: itemVariantId,
+      item: {
+        id: itemId,
+      },
+    },
+    select: {
+      label: true,
       stock: true,
       price: true,
     },

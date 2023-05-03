@@ -6,7 +6,7 @@ export const validatePostUpgradePayload = (payload: any) => {
     city: Joi.string().required(),
     address: Joi.string().required(),
     bankName: Joi.string().required(),
-    bankNumber: Joi.string().min(8).required(),
+    bankNumber: Joi.string().min(8).pattern(/^[0-9]+$/).required(),
     ownerName: Joi.string().required(),
   });
 

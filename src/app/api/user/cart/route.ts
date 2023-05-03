@@ -8,8 +8,8 @@ import verifyUserAccess from "@/backend/services/user";
 import {
   addItemToCart,
   getCartItems,
-  changeAmountItemCart,
-  deleteItemOnCart
+  changeAmountItemCartVariant,
+  deleteItemVariantOnCart,
 } from "@/backend/services/user/cartService";
 
 import {
@@ -49,9 +49,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     validatePostCartPayload(body);
 
-    const { itemId, amount } = body;
-
-    const title = await addItemToCart({ userId, itemId }, amount);
+    const { title } = await addItemToCart(userId, body);
 
     return NextResponse.json({
       status: "success",
@@ -75,9 +73,7 @@ export async function PUT(request: Request) {
     const body = await request.json();
     validatePutCartPayload(body);
 
-    const { itemId, amount } = body;
-
-    const title = await changeAmountItemCart({ userId, itemId }, amount);
+    const title = await changeAmountItemCartVariant(userId, body);
 
     return NextResponse.json({
       status: "success",
@@ -101,9 +97,7 @@ export async function DELETE(request: Request) {
     const body = await request.json();
     validateDeleteCartPayload(body);
 
-    const { itemId } = body;
-
-    const title = await deleteItemOnCart({ userId, itemId });
+    const title = await deleteItemVariantOnCart(userId, body);
 
     return NextResponse.json({
       status: "success",

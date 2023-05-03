@@ -12,9 +12,7 @@ export async function POST(request: Request) {
 
     validatePostRegisterPayload(body);
 
-    const { username, email, password } = body;
-
-    const id = await addUser({ username, email, password });
+    const id = await addUser(body);
     const token = generateToken(id);
 
     return NextResponse.json({

@@ -27,7 +27,7 @@ interface upgradeRoleSellerByIdParams {
   ownerName: string;
 }
 
-const _verifyNewUsernameAndEmail = async (username: string, email: string) => {
+const _verifyNewUser = async (username: string, email: string) => {
   const user = await prisma.user.findFirst({
     where: {
       OR: [
@@ -81,7 +81,7 @@ const _checkIfPhoneNumberExist = async (id: string) => {
 }
 
 export const addUser = async ({ username, email, password }: addUserParams) => {
-  await _verifyNewUsernameAndEmail(username, email);
+  await _verifyNewUser(username, email);
 
   const id = `user-${nanoid(16)}`
   const hashedPassword = await bcrypt.hash(password, 10);
