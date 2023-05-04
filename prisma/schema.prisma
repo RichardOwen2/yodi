@@ -187,7 +187,7 @@ model ItemOrder {
   itemOrderStatus         ItemOrderStatus[]
   itemOrderVariant        ItemOrderVariant[]
   itemOrderImage          ItemOrderImage[]
-  ItemOrderShippingStatus ItemOrderShippingStatus[]
+  itemOrderShippingStatus ItemOrderShippingStatus[]
 
   @@map("item_order")
 }
@@ -237,7 +237,7 @@ model ItemOrderShippingStatus {
 
   itemOrder ItemOrder @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
 
-  @@map("item_order_shippinh_status")
+  @@map("item_order_shipping_status")
 }
 
 model Shipper {
