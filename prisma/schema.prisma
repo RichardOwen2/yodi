@@ -38,9 +38,25 @@ model User {
 
   seller      Seller?
   admin       Admin?
+  userAddress UserAddress[]
   itemOrder   ItemOrder[]
   itemRequest ItemRequest[]
-  Cart        Cart[]
+  cart        Cart[]
+}
+
+model UserAddress {
+  id        String   @id
+  userId    String
+  label     String
+  city      String
+  address   String
+  note      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_address")
 }
 
 model Seller {
@@ -54,9 +70,9 @@ model Seller {
 
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   item        Item[]
-  ItemRequest ItemRequest[]
+  itemRequest ItemRequest[]
   bank        Bank?
-  ItemOrder   ItemOrder[]
+  itemOrder   ItemOrder[]
 }
 
 model Bank {
@@ -149,22 +165,29 @@ model CartVariant {
 }
 
 model ItemOrder {
-  id          String   @id
-  userId      String   @map("user_id")
-  sellerId    String   @map("seller_id")
-  title       String
-  description String
-  price       Int
-  amount      Int
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id
+  userId       String   @map("user_id")
+  sellerId     String   @map("seller_id")
+  title        String
+  description  String
+  itemNote     String   @map("item_note")
+  city         String
+  address      String
+  addressNote  String?  @map("address_note")
+  shipper      String
+  shipperPrice Int      @map("shipper_price")
+  price        Int
+  amount       Int
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   seller Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  itemOrderStatus  ItemOrderStatus[]
-  itemOrderVariant ItemOrderVariant[]
-  itemOrderImage   ItemOrderImage[]
+  itemOrderStatus         ItemOrderStatus[]
+  itemOrderVariant        ItemOrderVariant[]
+  itemOrderImage          ItemOrderImage[]
+  ItemOrderShippingStatus ItemOrderShippingStatus[]
 
   @@map("item_order")
 }
@@ -203,6 +226,27 @@ model ItemOrderStatus {
   itemOrder ItemOrder @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
 
   @@map("item_order_status")
+}
+
+model ItemOrderShippingStatus {
+  id          String   @id
+  itemOrderId String   @map("item_order_id")
+  status      String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  itemOrder ItemOrder @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
+
+  @@map("item_order_shippinh_status")
+}
+
+model Shipper {
+  id        String   @id
+  name      String
+  price     Int
+  city      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model ItemRequest {

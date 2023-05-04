@@ -10,9 +10,15 @@ import type { itemVariantDataType } from "./itemService";
 
 import { takeStocksFromItem } from "./itemService";
 import { checkIfTheItemAvailable, getItemVariantStockById } from "../itemService";
+import { checkUserPhoneNumber } from "./accountService";
+import { getAddressById } from "./addressService";
+import { getShipperById } from "../shipperService";
 
 interface OrderParams {
+  addressId: string;
   itemId: string;
+  itemNote: string;
+  shipperId: string;
   itemVariant: {
     id: string,
     amount: number,
@@ -26,7 +32,12 @@ interface orderVariantDataType {
   amount: number;
 }
 
-export const orderItem = async (userId: string, { itemId, itemVariant }: OrderParams) => {
+export const orderItem = async (userId: string, { addressId, shipperId, itemId, itemVariant, itemNote }: OrderParams) => {
+  await checkUserPhoneNumber(userId);
+
+  const { city, address, note } = await getAddressById(userId, { addressId });
+  const { name, price: shipperPrice } = await getShipperById(shipperId);
+
   const { title, sellerId, description, itemImage } = await checkIfTheItemAvailable(itemId);
 
   const itemVariantDatas: itemVariantDataType[] = [];
@@ -73,13 +84,19 @@ export const orderItem = async (userId: string, { itemId, itemVariant }: OrderPa
 
   const orderPrice = orderVariantDatas.reduce((total, { price, amount }) => {
     return total + (price * amount);
-  }, 0);
+  }, shipperPrice);
 
   const order = await prisma.itemOrder.create({
     data: {
       id: orderId,
       userId,
       sellerId,
+      city,
+      address,
+      addressNote: note,
+      shipper: name,
+      shipperPrice,
+      itemNote,
       title,
       description,
       amount: orderAmount,
@@ -250,6 +267,10 @@ export const getOrderById = async (userId: string, orderId: string) => {
       title: true,
       price: true,
       amount: true,
+      itemNote: true,
+      city: true,
+      address: true,
+      addressNote: true,
       itemOrderVariant: {
         select: {
           label: true,
@@ -285,7 +306,7 @@ export const getOrderById = async (userId: string, orderId: string) => {
   });
 
   if (!order) {
-    throw new NotFoundError("Item tidak ditemukan");
+    throw new NotFoundError("Item Order tidak ditemukan");
   }
 
   return order;
