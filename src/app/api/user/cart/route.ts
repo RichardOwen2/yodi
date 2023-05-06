@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     validatePostCartPayload(body);
 
-    const { title } = await addItemToCart(userId, body);
+    const title = await addItemToCart(userId, body);
 
     return NextResponse.json({
       status: "success",

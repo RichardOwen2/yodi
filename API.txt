@@ -317,7 +317,7 @@ Mendapatkan item di cart
   note : jika seller sewaktu-waktu tekena banned, item dlm cart tidak akan ditampilkan
 
 
-Menambahkan item di cart
+Menambahkan item di cart (dapat menambahkan variasi item keitem jika item sudah ad dicart)
   POST API/USER/CART
 
   Body Request = {
@@ -330,6 +330,8 @@ Menambahkan item di cart
       { ... }
     ]
   }
+
+  - note jika variasi item sudah ad tetapi ditambahkan lgi maka yang tertambah hanya amountnya
 
   Response Message = `Berhasil menambahkan ${title} didalam cart`
 
