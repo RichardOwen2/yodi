@@ -283,7 +283,9 @@ Mendapatkan item di cart
   Response Data = 
   cart: [
       {
+          id: string,
           item: {
+              id: string,
               title: dwada,
               seller: {
                   city: aa,
@@ -299,6 +301,7 @@ Mendapatkan item di cart
           },
           cartVariant: [
               {
+                  id: true,
                   amount: number,
                   itemVariant: {
                       label: string,
@@ -389,6 +392,7 @@ Mendapatkan list item checkout/order
 
   Response Data = orders: [
       {
+          id: string,
           title: string,
           price: number (generate otomatis sebagai total harga),
           amount: number,

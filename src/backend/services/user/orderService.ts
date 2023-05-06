@@ -5,7 +5,7 @@ import InvariantError from "@/backend/errors/InvariantError";
 
 import prisma from "@/backend/libs/prismadb"
 import type { PaginationParams } from "@/types";
-import { ItemStatus } from "@prisma/client";
+import { OrderStatus } from "@prisma/client";
 import type { itemVariantDataType } from "./itemService";
 
 import { takeStocksFromItem } from "./itemService";
@@ -104,7 +104,7 @@ export const orderItem = async (userId: string, { addressId, shipperId, itemId, 
       itemOrderStatus: {
         create: {
           id: statusId,
-          status: ItemStatus.PAYMENT,
+          status: OrderStatus.PAYMENT,
         }
       },
       itemOrderVariant: {
@@ -155,6 +155,7 @@ export const getOrders = async (userId: string, { page, itemCount }: PaginationP
       userId
     },
     select: {
+      id: true,
       title: true,
       price: true,
       amount: true,

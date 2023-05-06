@@ -132,8 +132,10 @@ export const getCartItems = async (userId: string) => {
       }
     },
     select: {
+      id: true,
       item: {
         select: {
+          id: true,
           title: true,
           seller: {
             select: {
@@ -155,6 +157,7 @@ export const getCartItems = async (userId: string) => {
       },
       cartVariant: {
         select: {
+          id: true,
           amount: true,
           itemVariant: {
             select: {
