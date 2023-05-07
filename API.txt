@@ -63,10 +63,10 @@ LOGIN
 
 
 Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
-  GET API/ITEM?page=x&itemCount=x&search=x
+  GET API/ITEM?page=x&itemCount=x&search=x&seller=x
 
   jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
-  page -> number, itemCount -> number, search -> string | undefined
+  page -> number, itemCount -> number, search -> string | undefined, seller -> string | undefined
   search -> berdasarkan title
 
   Response Data = {
@@ -131,6 +131,7 @@ Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh
             ],
             itemVariant: [
                 {
+                    id: string,
                     label: string,
                     price: number,
                     stock: number
@@ -142,6 +143,23 @@ Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh
 
   fail:
   - item tidak ditemukan
+
+
+Mendapatkan Top Seller
+  GET API/SELLER/TOP
+
+  Response Data = {
+    sellers: {
+      id: string,
+      city: string,
+      user: {
+        select: {
+          username: string,
+          image: string,
+        }
+      },
+    }
+  }
 
 
 Mendapatkan Shipper
