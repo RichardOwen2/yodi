@@ -17,6 +17,33 @@ interface CartParams {
   }[];
 }
 
+interface CartData {
+  cartVariant: {
+    itemVariant: {
+      id: string;
+      label: string;
+      stock: number;
+    };
+    amount: number;
+  }[];
+  id: string;
+}
+
+interface CartUpdatedVariantData {
+  where: {
+    itemVariantId: string;
+  };
+  data: {
+    amount: number;
+  };
+}
+
+interface CartNewVariantData {
+  id: string;
+  itemVariantId: string;
+  amount: number;
+}
+
 interface ChangeCartParams {
   cartId: string;
   itemVariant: {
@@ -72,8 +99,110 @@ const _checkIfVariantExist = async (cartId: string) => {
   }
 }
 
+const _checkIfItemAlreadyInCart = async (userId: string, itemId: string) => {
+  const cart = await prisma.cart.findFirst({
+    where: {
+      itemId,
+      userId,
+    },
+    select: {
+      id: true,
+      cartVariant: {
+        select: {
+          amount: true,
+          itemVariant: {
+            select: {
+              id: true,
+              label: true,
+              stock: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return cart;
+}
+
+const _addNewVariantItemToCart = async (cartData: CartData, { itemId, itemVariant }: CartParams) => {
+  const cartNewVariantData: CartNewVariantData[] = [];
+
+  const cartUpdatedVariantData: CartUpdatedVariantData[] = [];
+
+  await Promise.all(itemVariant.map(async ({ id, amount }) => {
+    const { stock, label } = await getItemVariantStockById(itemId, id);
+
+    const existingVariant = cartData.cartVariant.find(
+      (cartItemVariant) => cartItemVariant.itemVariant.id === id
+    );
+
+    if (existingVariant) {
+      const variantAmount = amount + existingVariant.amount;
+
+      if (variantAmount > stock) {
+        throw new InvariantError(`Stock item variant ${label} tidak cukup`);
+      }
+
+      cartUpdatedVariantData.push({
+        where: {
+          itemVariantId: id,
+        },
+        data: {
+          amount: variantAmount,
+        },
+      });
+
+      return;
+    }
+
+    if (amount > stock) {
+      throw new InvariantError(`Stock item variant ${label} tidak cukup`);
+    }
+
+    const cartVariantId = `cartVariant-${nanoid(16)}`;
+
+    cartNewVariantData.push({
+      id: cartVariantId,
+      itemVariantId: id,
+      amount,
+    });
+
+    return;
+  }));
+
+
+  const cart = await prisma.cart.update({
+    where: {
+      id: cartData.id,
+    },
+    data: {
+      cartVariant: {
+        updateMany: cartUpdatedVariantData,
+        createMany: {
+          data: cartNewVariantData,
+        },
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!cart) {
+    throw new InvariantError("Gagal menambahkan variasi item");
+  }
+}
+
 export const addItemToCart = async (userId: string, { itemId, itemVariant }: CartParams) => {
-  const title = await checkIfTheItemAvailable(itemId);
+  const { title } = await checkIfTheItemAvailable(itemId);
+
+  const cartData = await _checkIfItemAlreadyInCart(userId, itemId);
+
+  if (cartData) {
+    await _addNewVariantItemToCart(cartData, { itemId, itemVariant });
+    return title;
+  }
 
   const cartId = `cart-${nanoid(16)}`;
 
@@ -132,8 +261,10 @@ export const getCartItems = async (userId: string) => {
       }
     },
     select: {
+      id: true,
       item: {
         select: {
+          id: true,
           title: true,
           seller: {
             select: {
@@ -155,6 +286,7 @@ export const getCartItems = async (userId: string) => {
       },
       cartVariant: {
         select: {
+          id: true,
           amount: true,
           itemVariant: {
             select: {

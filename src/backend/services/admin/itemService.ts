@@ -3,7 +3,7 @@ import { nanoid } from "nanoid"
 import InvariantError from "@/backend/errors/InvariantError";
 import NotFoundError from "@/backend/errors/NotFoundError";
 
-import prisma from "@/backend/libs/prismadb"
+import prisma from "@/backend/libs/prismadb";
 import { PaginationParams } from "@/types";
 
 export const verifyItemById = async (itemId: string) => {

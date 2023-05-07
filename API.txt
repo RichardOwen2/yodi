@@ -144,6 +144,20 @@ Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh
   - item tidak ditemukan
 
 
+Mendapatkan Shipper
+  GET API/SHIPPER
+
+  Response Data = {
+    shippers: [
+      {
+        city: string,
+        price: number,
+        name: string,
+      },
+      { ... }
+    ]
+  }
+
 ------ USER ------
 
 Common Fail :
@@ -159,7 +173,8 @@ Mendapatkan data diri (khusus route ini bisa diakses bahkan jika user terbanned)
     username: string,
     status: enum(ACTIVE/BANNED),
     email: string,
-    image: string,
+    phoneNumber: string | null,
+    image: string | null,
     createdAt: Date,
     updatedAt: Date,
   }
@@ -179,6 +194,67 @@ Melakukan edit/ Menambahkan data diri (username, phoneNumber, photoProfile)
   fail:
   - username sudah digunakan (jika mengisi username)
   - phoneNumber berisikan value selain angka (angka bentuk string) (jika mengisi phoneNumber)
+
+
+Menambahkan alamat pengiriman
+  POST API/USER/ME/ADDRESS
+
+  Body Request = {
+    label: string,
+    city: string,
+    address: string,
+    note: string | undefined
+  }
+
+  Response Message: "Berhasil menambahkan alamat"
+
+
+Mendapatkan list alamat pengiriman
+  GET API/USER/ME/ADDRESS
+
+  Response Data = {
+    address: [
+      {
+        label: string;
+        city: string;
+        address: string;
+        note: string | null;
+      },
+      { ... }
+    ]
+  }
+
+
+Mengedit alamat pengiriman
+  PUT API/USER/ME/ADDRESS
+
+  Body Request = {
+    addressId: string,
+    label: string | undefined,
+    city: string | undefined,
+    address: string | undefined,
+    note: string | undefined
+  }
+
+  - Semua key optional tetapi harus mengisikan salah satunya
+
+  Response Message: "Berhasil mengedit alamat"
+
+  fail :
+  - Bukan address miliknya
+
+
+Menghapus alamat pengiriman
+  DELETE API/USER/ME/ADDRESS
+
+  Body Request = {
+    addressId: string
+  }
+
+  Response Message: "Berhasil menghapus alamat"
+
+  fail:
+  - Bukan address miliknya
 
 
 Mengajukan diri menjadi seller
@@ -207,7 +283,9 @@ Mendapatkan item di cart
   Response Data = 
   cart: [
       {
+          id: string,
           item: {
+              id: string,
               title: dwada,
               seller: {
                   city: aa,
@@ -223,6 +301,7 @@ Mendapatkan item di cart
           },
           cartVariant: [
               {
+                  id: true,
                   amount: number,
                   itemVariant: {
                       label: string,
@@ -238,7 +317,7 @@ Mendapatkan item di cart
   note : jika seller sewaktu-waktu tekena banned, item dlm cart tidak akan ditampilkan
 
 
-Menambahkan item di cart
+Menambahkan item di cart (dapat menambahkan variasi item keitem jika item sudah ad dicart)
   POST API/USER/CART
 
   Body Request = {
@@ -251,6 +330,8 @@ Menambahkan item di cart
       { ... }
     ]
   }
+
+  - note jika variasi item sudah ad tetapi ditambahkan lgi maka yang tertambah hanya amountnya
 
   Response Message = `Berhasil menambahkan ${title} didalam cart`
 
@@ -313,6 +394,7 @@ Mendapatkan list item checkout/order
 
   Response Data = orders: [
       {
+          id: string,
           title: string,
           price: number (generate otomatis sebagai total harga),
           amount: number,
@@ -347,11 +429,15 @@ Mendapatkan list item checkout/order
       { ... }
   ]
 
+
 Melakukan checkout/order item
   POST API/USER/ORDER
 
   Body Request = {
     itemId: string,
+    itemNote: string,
+    addressId: string,
+    shipperId: string,
     itemVariant: [
       {
         id: string, (id => itemVariantId)
@@ -368,6 +454,9 @@ Melakukan checkout/order item
   - amount melebihi stock item
   - amount kurang dari 1
   - seller terbanned
+  - user harus sudah mendaftarkan nomor telephone
+
+
 
 ------ SELLER ------
 
@@ -750,3 +839,46 @@ Mendapatkan item by id
 
   fail :
   - jika item tidak ditemukan
+
+
+Menambahkan shipper
+  POST API/ADMIN/SHIPPER
+
+  Body Request = {
+    name: string,
+    price: number > 1000,
+    city: string,
+  }
+
+  Response Message = "Berhasil menambahkan shipper"
+
+
+Mengedit Shipper
+  PUT API/ADMIN/SHIPPER
+
+  Body Request = {
+    id: string, (id => shipperId)
+    name: string | undefined, 
+    price: number > 1000 | undefined,
+    city: string | undefined,
+  }
+
+  - Semua key optional tetapi harus mengisikan salah satunya
+
+  Response Message = "Berhasil mengedit shipper"
+
+
+Menghapus Shipper
+  DELETE API/ADMIN/SHIPPER
+
+  Body Request: {
+    id: string (id => shipperId)
+  }
+
+  Response Message = "Berhasil menghapus shipper"
+
+
+Mendapatkan Shipper
+  > Baca dokumentasi get shipper di guest
+
+

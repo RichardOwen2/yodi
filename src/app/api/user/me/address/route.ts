@@ -6,29 +6,30 @@ import getTokenHandler from "@/backend/utils/getTokenHandler";
 import verifyUserAccess from "@/backend/services/user";
 
 import {
-  addItemToCart,
-  getCartItems,
-  changeAmountItemCartVariant,
-  deleteItemVariantOnCart,
-} from "@/backend/services/user/cartService";
+  addAddress,
+  editAddress,
+  deleteAddress,
+  getAddress
+} from "@/backend/services/user/addressService";
 
 import {
-  validatePostCartPayload,
-  validatePutCartPayload,
-  validateDeleteCartPayload
-} from "@/backend/validators/user/cartValidator";
+  validatePostAddressPayload,
+  validateDeleteAddressPayload,
+  validatePutAddressPayload
+} from "@/backend/validators/user/addressValidator";
+
 
 export async function GET(request: Request) {
   try {
     const userId = getTokenHandler(request);
     await verifyUserAccess(userId);
 
-    const cart = await getCartItems(userId);
+    const address = await getAddress(userId);
 
     return NextResponse.json({
       status: "success",
       data: {
-        cart,
+        address,
       },
     });
   } catch (error) {
@@ -47,14 +48,14 @@ export async function POST(request: Request) {
     await verifyUserAccess(userId);
 
     const body = await request.json();
-    validatePostCartPayload(body);
+    validatePostAddressPayload(body);
 
-    const title = await addItemToCart(userId, body);
+    await addAddress(userId, body);
 
     return NextResponse.json({
       status: "success",
-      message: `Berhasil menambahkan ${title} didalam cart`,
-    });
+      message: "Berhasil menambahkan alamat",
+    })
   } catch (error) {
     const { data, status } = errorHandler(error);
 
@@ -71,14 +72,14 @@ export async function PUT(request: Request) {
     await verifyUserAccess(userId);
 
     const body = await request.json();
-    validatePutCartPayload(body);
+    validatePutAddressPayload(body);
 
-    const title = await changeAmountItemCartVariant(userId, body);
+    await editAddress(userId, body);
 
     return NextResponse.json({
       status: "success",
-      message: `Berhasil melakukan edit jumlah ${title} didalam cart`
-    });
+      message: "Berhasil mengedit alamat",
+    })
   } catch (error) {
     const { data, status } = errorHandler(error);
 
@@ -95,13 +96,13 @@ export async function DELETE(request: Request) {
     await verifyUserAccess(userId);
 
     const body = await request.json();
-    validateDeleteCartPayload(body);
+    validateDeleteAddressPayload(body);
 
-    const title = await deleteItemVariantOnCart(userId, body);
+    await deleteAddress(userId, body);
 
     return NextResponse.json({
       status: "success",
-      message: `Berhasil menghapus ${title} didalam cart`,
+      message: "Berhasil menghapus alamat",
     })
   } catch (error) {
     const { data, status } = errorHandler(error);

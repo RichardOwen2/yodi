@@ -6,23 +6,42 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-enum ItemStatus {
-  PAYMENT             @map("Menunggu pembayaran")
-  SELLER_VERIFICATION @map("Verifikasi Seller")
-  PRODUCT_PROCESS     @map("Pesanan diproses")
-  READY               @map("Pesanan siap diambil")
-  DONE                @map("Pesanan selesai")
-  CANCEL              @map("Pesanan dibatalkan")
-  REJECT              @map("Pesanan ditolak")
 }
 
 enum AccountStatus {
   ACTIVE
   BANNED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILURE
+  REFUNDED
+}
+
+enum OrderStatus {
+  PAYMENT             @map("Menunggu pembayaran")
+  SELLER_VERIFICATION @map("Verifikasi Seller")
+  PRODUCT_PROCESS     @map("Pesanan diproses")
+  READY               @map("Pesanan siap diantar")
+  SHIPPING            @map("Pesanan sedang diantar")
+  DONE                @map("Pesanan selesai")
+  CANCEL              @map("Pesanan dibatalkan")
+  REJECT              @map("Pesanan ditolak")
+}
+
+enum RequestStatus {
+  SELLER_VERIFICATION @map("Verifikasi Seller")
+  PAYMENT             @map("Menunggu pembayaran")
+  PRODUCT_PROCESS     @map("Pesanan diproses")
+  READY               @map("Pesanan siap diantar")
+  SHIPPING            @map("Pesanan sedang diantar")
+  DONE                @map("Pesanan selesai")
+  CANCEL              @map("Pesanan dibatalkan")
+  REJECT              @map("Pesanan ditolak")
 }
 
 model User {
@@ -38,9 +57,25 @@ model User {
 
   seller      Seller?
   admin       Admin?
+  userAddress UserAddress[]
   itemOrder   ItemOrder[]
   itemRequest ItemRequest[]
-  Cart        Cart[]
+  cart        Cart[]
+}
+
+model UserAddress {
+  id        String   @id
+  userId    String
+  label     String
+  city      String
+  address   String
+  note      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_address")
 }
 
 model Seller {
@@ -54,9 +89,9 @@ model Seller {
 
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   item        Item[]
-  ItemRequest ItemRequest[]
+  itemRequest ItemRequest[]
   bank        Bank?
-  ItemOrder   ItemOrder[]
+  itemOrder   ItemOrder[]
 }
 
 model Bank {
@@ -75,6 +110,15 @@ model Admin {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Shipper {
+  id        String   @id
+  name      String
+  price     Int
+  city      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model Item {
@@ -149,22 +193,30 @@ model CartVariant {
 }
 
 model ItemOrder {
-  id          String   @id
-  userId      String   @map("user_id")
-  sellerId    String   @map("seller_id")
-  title       String
-  description String
-  price       Int
-  amount      Int
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id
+  userId       String   @map("user_id")
+  sellerId     String   @map("seller_id")
+  title        String
+  description  String
+  itemNote     String   @map("item_note")
+  city         String
+  address      String
+  addressNote  String?  @map("address_note")
+  shipper      String
+  shipperPrice Int      @map("shipper_price")
+  price        Int
+  amount       Int
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   seller Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  itemOrderStatus  ItemOrderStatus[]
-  itemOrderVariant ItemOrderVariant[]
-  itemOrderImage   ItemOrderImage[]
+  itemOrderStatus         ItemOrderStatus[]
+  itemOrderVariant        ItemOrderVariant[]
+  itemOrderImage          ItemOrderImage[]
+  itemOrderShippingStatus ItemOrderShippingStatus[]
+  itemOrderPayment        ItemOrderPayment?
 
   @@map("item_order")
 }
@@ -194,15 +246,36 @@ model ItemOrderVariant {
 }
 
 model ItemOrderStatus {
-  id          String     @id
-  itemOrderId String     @map("item_order_id")
-  status      ItemStatus
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
+  id          String      @id
+  itemOrderId String      @map("item_order_id")
+  status      OrderStatus
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
 
   itemOrder ItemOrder @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
 
   @@map("item_order_status")
+}
+
+model ItemOrderPayment {
+  transactionId String  @id @map("transaction_id")
+  itemOrderId   String  @unique @map("item_order_id")
+  paymentStatus String  @map("payment_status")
+  note          String?
+
+  itemOrder ItemOrder @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
+}
+
+model ItemOrderShippingStatus {
+  id          String   @id
+  itemOrderId String   @map("item_order_id")
+  status      String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  itemOrder ItemOrder @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
+
+  @@map("item_order_shipping_status")
 }
 
 model ItemRequest {
@@ -214,25 +287,63 @@ model ItemRequest {
   description String
   price       Int
   amount      Int
+  city        String
+  address     String
+  addressNote String?  @map("address_note")
+  shipper     String
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   seller Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  itemRequestStatus ItemRequestStatus[]
+  itemRequestStatus         ItemRequestStatus[]
+  itemRequestImage          ItemRequestImage[]
+  itemRequestShippingStatus ItemRequestShippingStatus[]
+  itemRequestPayment        ItemRequestPayment?
 
   @@map("item_request")
 }
 
+model ItemRequestImage {
+  id            Int    @id @default(autoincrement())
+  itemRequestId String @map("item_request_id")
+  image         String
+
+  itemRequest ItemRequest @relation(fields: [itemRequestId], references: [id], onDelete: Cascade)
+
+  @@map("item_request_image")
+}
+
 model ItemRequestStatus {
-  id            String     @id
-  itemRequestId String     @map("item_request_id")
-  status        ItemStatus
-  createdAt     DateTime   @default(now()) @map("created_at")
-  updatedAt     DateTime   @updatedAt @map("updated_at")
+  id            String        @id
+  itemRequestId String        @map("item_request_id")
+  status        RequestStatus
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
   itemRequest ItemRequest @relation(fields: [itemRequestId], references: [id], onDelete: Cascade)
 
   @@map("item_request_status")
+}
+
+model ItemRequestPayment {
+  transactionId String  @id @map("transaction_id")
+  itemRequestId String  @unique @map("item_request_id")
+  paymentStatus String  @map("payment_status")
+  note          String?
+
+  itemRequest ItemRequest @relation(fields: [itemRequestId], references: [id], onDelete: Cascade)
+}
+
+model ItemRequestShippingStatus {
+  id            String   @id
+  itemRequestId String   @map("item_request_id")
+  status        String
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  itemOrder ItemRequest @relation(fields: [itemRequestId], references: [id], onDelete: Cascade)
+
+  @@map("item_request_shipping_status")
 }
