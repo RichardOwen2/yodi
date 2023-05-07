@@ -134,7 +134,7 @@ const _addNewVariantItemToCart = async (cartData: CartData, { itemId, itemVarian
     const { stock, label } = await getItemVariantStockById(itemId, id);
 
     const existingVariant = cartData.cartVariant.find(
-      (cartItemVariant) => cartItemVariant.itemVariant.id === id
+      ({ itemVariant }) => itemVariant.id === id
     );
 
     if (existingVariant) {
