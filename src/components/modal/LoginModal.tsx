@@ -39,13 +39,16 @@ const LoginModal = () => {
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    setIsLoading(true);
     
     try {
+      setIsLoading(true);
+
       const response = await axios.get(`${BASEAPIURL}/user/me`);
 
     } catch (error) {
       
+    } finally {
+      setIsLoading(true);
     }
   }
 
