@@ -31,6 +31,9 @@ export const verifyItemById = async (itemId: string) => {
     data: {
       verifiedAt: new Date(),
     },
+    select: {
+      id: true,
+    },
   });
 
   if (!verify) {
@@ -45,11 +48,15 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
     select: {
       id: true,
       title: true,
-      price: true,
-      stock: true,
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
+      itemImage: {
+        take: 1,
+        select: {
+          image: true,
+        },
+      },
       seller: {
         select: {
           id: true,
@@ -63,7 +70,12 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
             }
           }
         }
-      }
+      },
+      _count: {
+        select: {
+          itemVariant: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -85,11 +97,15 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
     select: {
       id: true,
       title: true,
-      price: true,
-      stock: true,
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
+      itemImage: {
+        take: 1,
+        select: {
+          image: true,
+        },
+      },
       seller: {
         select: {
           id: true,
@@ -103,7 +119,12 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
             }
           }
         }
-      }
+      },
+      _count: {
+        select: {
+          itemVariant: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -121,29 +142,35 @@ export const getItemById = async (id: string) => {
     select: {
       id: true,
       title: true,
-      description: true,
-      image: true,
-      price: true,
-      stock: true,
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
+      itemImage: {
+        select: {
+          image: true,
+        },
+      },
       seller: {
         select: {
           id: true,
           city: true,
-          address: true,
           verifiedAt: true,
           user: {
             select: {
               username: true,
               email: true,
-              image: true,
               status: true,
             }
           }
         }
-      }
+      },
+      itemVariant: {
+        select: {
+          label: true,
+          price: true,
+          stock: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',

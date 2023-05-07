@@ -3,20 +3,35 @@ import InvariantError from "@/backend/errors/InvariantError";
 
 import prisma from "@/backend/libs/prismadb"
 
-export const takeStockFromItem = async (itemId: string, amount: number) => {
+import { getItemVariantStockById } from "../itemService";
+
+export interface itemVariantDataType {
+  where: {
+    id: string;
+  };
+  data: {
+    stock: {
+      decrement: number;
+    };
+  };
+}
+
+interface takeStockParams {
+  itemId: string;
+  itemVariantDatas: itemVariantDataType[];
+}
+
+export const takeStocksFromItem = async ({ itemId, itemVariantDatas } : takeStockParams) => {
   const item = await prisma.item.update({
     where: {
-      id: itemId
+      id: itemId,
     },
     data: {
-      stock: {
-        decrement: amount
+      itemVariant: {
+        updateMany: itemVariantDatas
       }
-    },
-    select: {
-      id: true,
-    },
-  });
+    }
+  })
 
   if (!item) {
     throw new InvariantError("Gagal mengambil stock item");

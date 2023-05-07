@@ -4,42 +4,102 @@ import NotFoundError from "@/backend/errors/NotFoundError";
 import InvariantError from "@/backend/errors/InvariantError";
 
 import prisma from "@/backend/libs/prismadb"
-import { PaginationParams } from "@/types";
+import type { PaginationParams } from "@/types";
 import { ItemStatus } from "@prisma/client";
+import type { itemVariantDataType } from "./itemService";
 
-import { getItemStockById } from "../itemService";
-import { takeStockFromItem } from "./itemService";
+import { takeStocksFromItem } from "./itemService";
+import { checkIfTheItemAvailable, getItemVariantStockById } from "../itemService";
 
 interface OrderParams {
-  userId: string;
   itemId: string;
+  itemVariant: {
+    id: string,
+    amount: number,
+  }[];
 }
 
-export const orderItem = async ({ userId, itemId }: OrderParams, amount: number) => {
-  const { price, stock, title } = await getItemStockById(itemId);
+interface orderVariantDataType {
+  id: string;
+  label: string;
+  price: number;
+  amount: number;
+}
 
-  if (amount > stock) {
-    throw new InvariantError("Stock barang tidak cukup!");
-  }
+export const orderItem = async (userId: string, { itemId, itemVariant }: OrderParams) => {
+  const { title, sellerId, description, itemImage } = await checkIfTheItemAvailable(itemId);
 
-  await takeStockFromItem(itemId, amount);
+  const itemVariantDatas: itemVariantDataType[] = [];
+  const orderVariantDatas: orderVariantDataType[] = [];
+
+  await Promise.all(itemVariant.map(async ({ id, amount }) => {
+    const { stock, label, price } = await getItemVariantStockById(itemId, id);
+
+    if (amount > stock) {
+      throw new InvariantError(`Stock item variant ${label} tidak cukup`);
+    }
+
+    itemVariantDatas.push({
+      where: {
+        id,
+      },
+      data: {
+        stock: {
+          decrement: amount,
+        },
+      },
+    });
+
+    const orderId = `orderVariant-${nanoid(16)}`;
+
+    orderVariantDatas.push({
+      id: orderId,
+      label,
+      price,
+      amount,
+    });
+
+    return;
+  }));
+
+  await takeStocksFromItem({ itemId, itemVariantDatas });
 
   const orderId = `itemOrder-${nanoid(16)}`;
-  const statusId = `itemOrderStatus-${nanoid(16)}`
+  const statusId = `itemOrderStatus-${nanoid(16)}`;
+
+  const orderAmount = orderVariantDatas.reduce((total, { amount }) => {
+    return total + amount;
+  }, 0);
+
+  const orderPrice = orderVariantDatas.reduce((total, { price, amount }) => {
+    return total + (price * amount);
+  }, 0);
 
   const order = await prisma.itemOrder.create({
     data: {
       id: orderId,
       userId,
-      itemId,
-      amount,
-      price,
-      ItemOrderStatus: {
+      sellerId,
+      title,
+      description,
+      amount: orderAmount,
+      price: orderPrice,
+      itemOrderStatus: {
         create: {
           id: statusId,
           status: ItemStatus.PAYMENT,
         }
-      }
+      },
+      itemOrderVariant: {
+        createMany: {
+          data: orderVariantDatas
+        }
+      },
+      itemOrderImage: {
+        createMany: {
+          data: itemImage,
+        },
+      },
     },
     select: {
       id: true,
@@ -47,7 +107,18 @@ export const orderItem = async ({ userId, itemId }: OrderParams, amount: number)
   });
 
   if (!order) {
-    await takeStockFromItem(itemId, -amount);
+    const giveBackItemData: itemVariantDataType[] = itemVariantDatas.map((item) => {
+      return {
+        ...item,
+        data: {
+          stock: {
+            decrement: -item.data.stock.decrement,
+          },
+        },
+      }
+    });
+
+    await takeStocksFromItem({ itemId, itemVariantDatas: giveBackItemData });
 
     throw new InvariantError("Gagal menambahkan orderan item");
   }
@@ -67,9 +138,18 @@ export const getOrders = async (userId: string, { page, itemCount }: PaginationP
       userId
     },
     select: {
+      title: true,
       price: true,
       amount: true,
-      ItemOrderStatus: {
+      createdAt: true,
+      itemOrderVariant: {
+        select: {
+          label: true,
+          amount: true,
+          price: true,
+        },
+      },
+      itemOrderStatus: {
         select: {
           status: true,
           createdAt: true,
@@ -78,19 +158,19 @@ export const getOrders = async (userId: string, { page, itemCount }: PaginationP
           createdAt: "desc",
         },
       },
-      item: {
+      itemOrderImage: {
+        take: 1,
         select: {
-          title: true,
           image: true,
-          seller: {
+        },
+      },
+      seller: {
+        select: {
+          city: true,
+          user: {
             select: {
-              city: true,
-              user: {
-                select: {
-                  username: true,
-                  phoneNumber: true,
-                },
-              },
+              username: true,
+              image: true,
             },
           },
         },
@@ -111,16 +191,24 @@ export const getOrdersBySearch = async (userId: string, search: string, { page, 
     take: itemCount,
     where: {
       userId,
-      item: {
-        title: {
-          contains: search
-        }
-      }
+      title: {
+        contains: search,
+      },
     },
     select: {
+      id: true,
+      title: true,
       price: true,
       amount: true,
-      ItemOrderStatus: {
+      itemOrderVariant: {
+        select: {
+          label: true,
+          amount: true,
+          price: true,
+        },
+      },
+      itemOrderStatus: {
+        take: 1,
         select: {
           status: true,
           createdAt: true,
@@ -129,19 +217,18 @@ export const getOrdersBySearch = async (userId: string, search: string, { page, 
           createdAt: "desc",
         },
       },
-      item: {
+      itemOrderImage: {
+        take: 1,
         select: {
-          title: true,
           image: true,
-          seller: {
+        },
+      },
+      seller: {
+        select: {
+          city: true,
+          user: {
             select: {
-              city: true,
-              user: {
-                select: {
-                  username: true,
-                  phoneNumber: true,
-                },
-              },
+              username: true,
             },
           },
         },
@@ -150,4 +237,56 @@ export const getOrdersBySearch = async (userId: string, search: string, { page, 
   });
 
   return orders;
+}
+
+export const getOrderById = async (userId: string, orderId: string) => {
+  const order = await prisma.itemOrder.findFirst({
+    where: {
+      userId,
+      id: orderId,
+    },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      amount: true,
+      itemOrderVariant: {
+        select: {
+          label: true,
+          amount: true,
+          price: true,
+        },
+      },
+      itemOrderStatus: {
+        select: {
+          status: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      itemOrderImage: {
+        select: {
+          image: true,
+        },
+      },
+      seller: {
+        select: {
+          city: true,
+          user: {
+            select: {
+              username: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!order) {
+    throw new NotFoundError("Item tidak ditemukan");
+  }
+
+  return order;
 }

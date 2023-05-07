@@ -57,9 +57,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     validatePostOrderPayload(body);
 
-    const { itemId, amount } = body;
-
-    const title = await orderItem({ userId, itemId }, amount);
+    const title = await orderItem(userId, body);
 
     return NextResponse.json({
       status: "success",
