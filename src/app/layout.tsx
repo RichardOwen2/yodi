@@ -1,6 +1,7 @@
 import Navbar from '@/components/navbar/Navbar'
 import './globals.css'
 import LoginModal from '@/components/modal/LoginModal'
+import AuthContext from '@/context/AuthContext'
 
 export const metadata = {
   title: 'YODI',
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        <LoginModal />
-        {children}
+        <AuthContext>
+          <Navbar />
+          <LoginModal />
+          {children}
+        </AuthContext>
       </body>
     </html>
   )

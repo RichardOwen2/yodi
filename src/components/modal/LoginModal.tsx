@@ -3,28 +3,30 @@
 import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import { signIn } from 'next-auth/react';
-import { 
-  FieldValues, 
-  SubmitHandler, 
+import {
+  FieldValues,
+  SubmitHandler,
   useForm
 } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { AiFillGithub } from "react-icons/ai";
 import { useRouter } from "next/navigation";
+import axios from 'axios';
 
 import useLoginModal from "@/hooks/useLoginModal";
 
 import Modal from "./Modal";
 import Input from "../inputs/Input";
 import Button from "../Button";
+import { BASEAPIURL } from "@/config";
 
 const LoginModal = () => {
   const router = useRouter();
   const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { 
-    register, 
+  const {
+    register,
     handleSubmit,
     formState: {
       errors,
@@ -35,28 +37,16 @@ const LoginModal = () => {
       password: ''
     },
   });
-  
-  const onSubmit: SubmitHandler<FieldValues> = 
-  (data) => {
+
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
+    
+    try {
+      const response = await axios.get(`${BASEAPIURL}/user/me`);
 
-    signIn('credentials', { 
-      ...data, 
-      redirect: false,
-    })
-    .then((callback) => {
-      setIsLoading(false);
-
-      if (callback?.ok) {
-        toast.success('Logged in');
-        router.refresh();
-        loginModal.onClose();
-      }
+    } catch (error) {
       
-      if (callback?.error) {
-        toast.error(callback.error);
-      }
-    });
+    }
   }
 
   const onToggle = useCallback(() => {
@@ -70,7 +60,7 @@ const LoginModal = () => {
         id="email"
         label="Email"
         disabled={isLoading}
-        register={register}  
+        register={register}
         errors={errors}
         required
       />
@@ -101,17 +91,16 @@ const LoginModal = () => {
         icon={AiFillGithub}
         onClick={() => signIn('github')}
       /> */}
-      <div className="
-      text-neutral-500 text-center mt-4 font-light">
+      <div className="text-neutral-500 text-center mt-4 font-light">
         <p>Pertama kali menggunakan yodi ?
-          <span 
-            onClick={onToggle} 
+          <span
+            onClick={onToggle}
             className="
               text-blue-800
               cursor-pointer 
               hover:underline
             "
-            > Download apps</span>
+          > Download apps</span>
         </p>
       </div>
     </div>
