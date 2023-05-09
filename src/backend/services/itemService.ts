@@ -56,6 +56,9 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
         select: {
           price: true,
         },
+        orderBy: {
+          price: 'asc'
+        },
       },
       _count: {
         select: {
@@ -253,6 +256,9 @@ export const getItemsBySellerAndSearch = async (search: string, seller: string, 
       itemVariant: {
         select: {
           price: true,
+        },
+        orderBy: {
+          price: 'asc'
         },
       },
       _count: {

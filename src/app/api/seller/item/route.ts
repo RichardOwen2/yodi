@@ -1,69 +1,33 @@
 import { NextResponse } from "next/server";
 
-import getTokenHandler from "@/backend/utils/getTokenHandler";
 import errorHandler from "@/backend/utils/errorHandler";
 
-import verifySellerAccess from "@/backend/services/seller";
-import { validatePostItemPayload } from "@/backend/validators/seller/itemValidator";
-
-import getPaginationParams from "@/backend/utils/getPaginationParams";
-
-import { getItemsBySeller, getVerifiedItemsBySeller } from "@/backend/services/seller/itemService";
-import { addItem } from "@/backend/services/seller/itemService";
+import { validateNumberParams } from "@/backend/validators/numberParamsValidator";
+import { getItemBySeller } from "@/backend/services/sellerService";
 
 export async function GET(request: Request) {
   try {
-    const userId = getTokenHandler(request);
-    await verifySellerAccess(userId);
-
     const { searchParams } = new URL(request.url);
 
-    const { page, itemCount } = getPaginationParams(searchParams);
-    const verified = searchParams.get("verified");
+    validateNumberParams(searchParams.get("sellerPage"));
+    validateNumberParams(searchParams.get("sellerItemCount"));
+    validateNumberParams(searchParams.get("itemItemCount"));
 
-    if (!verified) {
-      const items = await getItemsBySeller(userId, { page, itemCount });
+    const sellerPagination = {
+      page: searchParams.get("sellerPage") !== null ? parseInt(searchParams.get("sellerPage") as string) : 1,
+      itemCount: searchParams.get("sellerItemCount") !== null ? parseInt(searchParams.get("sellerItemCount") as string) : 10,
+    };
 
-      return NextResponse.json({
-        message: "success",
-        data: {
-          items,
-        },
-      });
-    }
+    const itemCount = searchParams.get("itemItemCount") !== null ? parseInt(searchParams.get("itemItemCount") as string) : 3
 
-    const items = await getVerifiedItemsBySeller(userId, { page, itemCount });
+    const sellers = await getItemBySeller(sellerPagination, itemCount);
 
     return NextResponse.json({
       message: "success",
       data: {
-        items,
+        sellers,
       },
     });
-  } catch (error) {
-    const { data, status } = errorHandler(error);
-
-    return NextResponse.json({
-      status: data.status,
-      message: data.message,
-    }, { status });
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const userId = getTokenHandler(request);
-    await verifySellerAccess(userId);
-
-    const body = await request.json();
-    validatePostItemPayload(body);
-
-    await addItem(userId, body);
-
-    return NextResponse.json({
-      status: "success",
-      message: "Berhasil mengajukan item penjualan",
-    }, { status: 201 });
   } catch (error) {
     const { data, status } = errorHandler(error);
 

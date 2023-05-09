@@ -64,6 +64,7 @@ LOGIN
 
 Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
   GET API/ITEM?page=x&itemCount=x&search=x&seller=x
+  OTOMATIS DIURUTKAN BERDASARKAN CREATED_AT
 
   jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
   page -> number, itemCount -> number, search -> string | undefined, seller -> string | undefined
@@ -92,7 +93,7 @@ Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin
                     {
                         price: number
                     },
-                    { ... }
+                    { ... } // terurut dari yang termurah ke termahal
                 ],
                 _count: {
                     itemVariant: number
@@ -105,6 +106,53 @@ Mendapatkan Data Item (hanya menampilkan item yang sudah diverifikasi oleh admin
   fail :
   - page dan itemCount kurang dari 1
   - page dan itemCount bukan number
+
+
+Mendapatkan Data Item Berdasarkan list seller
+  NOTE : UNTUK FITUR SEARCH PADA SELLER GUNAKAN API GET API/ITEM?page=x&itemCount=x&search=x&seller=x
+
+  GET SELLER/ITEM?sellerPage=x&sellerItemCount=x&itemItemCount=x
+  DIURUTKAN BERDASARKAN JUMLAH BARANG YANG BERHASIL TERJUAL
+
+  jika tidak memberi query page atau itemCount maka akan default sellerPage = 1, sellerItemCount = 10, itemItemCount = 3
+  sellerPage -> number, sellerItemCount -> number, itemCount -> number
+
+  Response Data = {
+    sellers: [
+      {
+        id: string;
+        city: string;
+        user: {
+            username: string;
+            image: string | null;
+        };
+        item: [ //kenapa item? karna penamaan database bukan gk konsisten hengki kontol
+            {
+                id: string,
+                title: string,
+                description: string,
+                sold: number,
+                itemImage: [
+                    {
+                        image: string
+                    }, // hanya 1
+                ],
+                itemVariant: [
+                    {
+                        price: number
+                    },
+                    { ... } // terurut dari yang termurah ke termahal
+                ],
+                _count: {
+                    itemVariant: number
+                }
+            },
+            { ... }
+          ]
+      },
+      { ... }
+    ],
+  }
 
 
 Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh admin dan akun yang berstatus aktif)
@@ -304,16 +352,17 @@ Mendapatkan item di cart
           id: string,
           item: {
               id: string,
-              title: dwada,
+              title: string,
               seller: {
                   city: aa,
                   user: {
+                      username: string,
                       image: null
                   }
               },
               itemImage: [
                   {
-                      image: a
+                      image: string
                   }, // hanya 1
               ]
           },
@@ -403,6 +452,25 @@ Menghapus itemVariant dalam cart
   - jika semua variant item dihapus maka cart terhapus otomatis
 
 
+Melakukan checkout/order dengan cart
+  POST API/USER/CART/ORDER
+
+  Body Request = {
+    cartId: string,
+    cartVariant: string[] | undefined, (array kosong tidak diterima)
+    itemNote: string,
+    addressId: string,
+    shipperId: string,
+  }
+
+  Response Message = message: `Berhasil melakukan order ${title}`
+
+  fail :
+    - user harus sudah mendaftarkan nomor telephone
+    - cart tidak ditemukan
+    - stock item tidak cukup
+
+
 Mendapatkan list item checkout/order
   GET API/USER/ORDER?page=x&itemCount=x&search=x
 
@@ -487,7 +555,7 @@ Common fail :
 
 
 Mendapatkan data diri akun seller (khusus route ini bisa diakses bahkan jika user terbanned)
-  GET API/SELLER/ME
+  GET API/PARTNER/ME
 
   Response Data = user: {
       id: string,
@@ -502,7 +570,7 @@ Mendapatkan data diri akun seller (khusus route ini bisa diakses bahkan jika use
 
 
 Mengajukan Item Penjualan
-  POST API/SELLER/ITEM
+  POST API/PARTNER/ITEM
 
   Body Request : {
     title: string,
@@ -524,7 +592,7 @@ Mengajukan Item Penjualan
 
 
 Mendapatkan list semua item yang diajukan
-  GET API/SELLER/ITEM?page=x&itemCount=x&search=x
+  GET API/PARTNER/ITEM?page=x&itemCount=x&search=x
 
   jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
   page -> number | undefined, itemCount -> number | undefined, search -> string | undefined
@@ -559,7 +627,7 @@ Mendapatkan list semua item yang diajukan
 
 
 Mendapatkan Item by Id
-  GET API/SELLER/ITEM/[id]
+  GET API/PARTNER/ITEM/[id]
   id => itemId
 
   Response Data = {
@@ -592,7 +660,7 @@ Mendapatkan Item by Id
 
 
 Mendapatkan list semua item yang sudah diverifikasi
-  GET API/SELLER/ITEM?page=x&itemCount=x&search=x&verified=x
+  GET API/PARTNER/ITEM?page=x&itemCount=x&search=x&verified=x
 
   jika tidak memberi query page atau itemCount maka akan default page = 1, itemCount = 5
   page -> number | undefined, itemCount -> number | undefined, search -> string | undefined ,verified -> string apapun

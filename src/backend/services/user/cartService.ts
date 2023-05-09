@@ -57,32 +57,6 @@ interface DeleteCartParams {
   cartVariantId: string;
 }
 
-const _verifyCartAccess = async ({ userId, cartId }: { userId: string, cartId: string }) => {
-  const cart = await prisma.cart.findFirst({
-    where: {
-      id: cartId,
-    },
-    select: {
-      userId: true,
-      item: {
-        select: {
-          id: true,
-        },
-      },
-    },
-  });
-
-  if (!cart) {
-    throw new NotFoundError("Cart tidak ditemukan");
-  }
-
-  if (cart.userId !== userId) {
-    throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
-  }
-
-  return cart.item.id;
-}
-
 const _checkIfVariantExist = async (cartId: string) => {
   const variant = await prisma.cartVariant.findFirst({
     where: {
@@ -194,6 +168,32 @@ const _addNewVariantItemToCart = async (cartData: CartData, { itemId, itemVarian
   }
 }
 
+export const verifyCartAccess = async ({ userId, cartId }: { userId: string, cartId: string }) => {
+  const cart = await prisma.cart.findFirst({
+    where: {
+      id: cartId,
+    },
+    select: {
+      userId: true,
+      item: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  if (!cart) {
+    throw new NotFoundError("Cart tidak ditemukan");
+  }
+
+  if (cart.userId !== userId) {
+    throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
+  }
+
+  return cart.item.id;
+}
+
 export const addItemToCart = async (userId: string, { itemId, itemVariant }: CartParams) => {
   const { title } = await checkIfTheItemAvailable(itemId);
 
@@ -271,6 +271,7 @@ export const getCartItems = async (userId: string) => {
               city: true,
               user: {
                 select: {
+                  username: true,
                   image: true,
                 },
               },
@@ -306,7 +307,7 @@ export const getCartItems = async (userId: string) => {
 }
 
 export const changeAmountItemCartVariant = async (userId: string, { cartId, itemVariant }: ChangeCartParams) => {
-  const itemId = await _verifyCartAccess({ userId, cartId });
+  const itemId = await verifyCartAccess({ userId, cartId });
 
   const cartVariantData = await Promise.all(itemVariant.map(async ({ id, amount }) => {
     const { stock, label } = await getItemVariantStockById(itemId, id);
@@ -342,7 +343,7 @@ export const changeAmountItemCartVariant = async (userId: string, { cartId, item
 }
 
 export const deleteItemVariantOnCart = async (userId: string, { cartId, cartVariantId }: DeleteCartParams) => {
-  await _verifyCartAccess({ userId, cartId });
+  await verifyCartAccess({ userId, cartId });
 
   const cart = await prisma.cartVariant.delete({
     where: {
@@ -364,4 +365,73 @@ export const deleteItemVariantOnCart = async (userId: string, { cartId, cartVari
   await _checkIfVariantExist(cartId);
 
   return cart.itemVariant.label;
+}
+
+export const deleteOrderedCartById = async (cartId: string) => {
+  const verify = await prisma.cart.delete({
+    where: {
+      id: cartId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!verify) {
+    throw new InvariantError("Gagal menghapus cart!")
+  }
+}
+
+export const deleteOrderedItemVariantCartById = async (cartVariant: string[]) => {
+  const verify = await prisma.cartVariant.deleteMany({
+    where: {
+      id: {
+        in: cartVariant,
+      },
+    },
+  });
+
+  if (!verify) {
+    throw new InvariantError("Gagal menghapus cart");
+  }
+}
+
+export const getOrderDataCart = async (cartId: string, cartVariantId: string[] | undefined) => {
+  const cartData = await prisma.cart.findUnique({
+    where: {
+      id: cartId,
+    },
+    select: {
+      itemId: true,
+      cartVariant: {
+        select: {
+          id: true,
+          amount: true,
+          itemVariant: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!cartData) {
+    throw new InvariantError("Gagal mendapatkan data cart");
+  }
+
+  if (cartVariantId) {
+    cartData.cartVariant = cartData.cartVariant.filter(({ id }) => cartVariantId.includes(id));
+  }
+
+  return {
+    itemId: cartData.itemId,
+    itemVariant: cartData.cartVariant.map(({ itemVariant, amount }) => {
+      return {
+        id: itemVariant.id,
+        amount: amount
+      };
+    }),
+  };
 }
