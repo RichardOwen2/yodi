@@ -197,7 +197,7 @@ Mendapatkan Top Seller
   GET API/SELLER/TOP
 
   Response Data = {
-    sellers: {
+    sellers: [
       id: string,
       city: string,
       user: {
@@ -206,7 +206,8 @@ Mendapatkan Top Seller
           image: string,
         }
       },
-    }
+      { ... }
+    ] // mendapatkan 6 item
   }
 
 
