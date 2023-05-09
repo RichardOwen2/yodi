@@ -46,6 +46,9 @@ export const getItemBySeller = async (sellerPagination: PaginationParams, itemIt
             not: null,
           },
         },
+        orderBy: {
+          sold: 'desc',
+        },
         select: {
           id: true,
           title: true,

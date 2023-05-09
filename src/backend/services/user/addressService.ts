@@ -68,6 +68,7 @@ export const getAddress = async (userId: string) => {
       userId,
     },
     select: {
+      id: true,
       label: true,
       city: true,
       address: true,

@@ -28,7 +28,7 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      sold: 'desc',
     },
     select: {
       seller: {
@@ -96,7 +96,7 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      sold: 'desc',
     },
     select: {
       seller: {
@@ -161,7 +161,7 @@ export const getItemsBySeller = async (seller: string, { page, itemCount }: Pagi
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      sold: 'desc',
     },
     select: {
       seller: {
@@ -229,7 +229,7 @@ export const getItemsBySellerAndSearch = async (search: string, seller: string, 
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      sold: 'desc',
     },
     select: {
       seller: {
