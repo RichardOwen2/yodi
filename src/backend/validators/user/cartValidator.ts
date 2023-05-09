@@ -49,3 +49,19 @@ export const validateDeleteCartPayload = (payload: any) => {
     throw new InvariantError(validationResult.error.message);
   }
 }
+
+export const validatePostCartOrderPayload = (payload: any) => {
+  const schema = Joi.object({
+    cartId: Joi.string().required(),
+    cartVariantId: Joi.array().items(Joi.string().required()).min(1),
+    itemNote: Joi.string().required(),
+    addressId: Joi.string().required(),
+    shipperId: Joi.string().required(),
+  });
+
+  const validationResult = schema.validate(payload);
+
+  if (validationResult.error) {
+    throw new InvariantError(validationResult.error.message);
+  }
+}

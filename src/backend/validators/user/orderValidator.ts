@@ -10,6 +10,9 @@ export const validatePostOrderPayload = (payload: any) => {
         amount: Joi.number().required(),
       }).required(),
     ).min(1).required(),
+    itemNote: Joi.string().required(),
+    addressId: Joi.string().required(),
+    shipperId: Joi.string().required(),
   });
 
   const validationResult = schema.validate(payload);

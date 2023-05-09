@@ -172,6 +172,7 @@ export const getUserProfileById = async (id: string) => {
       username: true,
       status: true,
       email: true,
+      phoneNumber: true,
       image: true,
       createdAt: true,
       updatedAt: true,

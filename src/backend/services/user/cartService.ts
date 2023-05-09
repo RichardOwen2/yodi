@@ -17,6 +17,33 @@ interface CartParams {
   }[];
 }
 
+interface CartData {
+  cartVariant: {
+    itemVariant: {
+      id: string;
+      label: string;
+      stock: number;
+    };
+    amount: number;
+  }[];
+  id: string;
+}
+
+interface CartUpdatedVariantData {
+  where: {
+    itemVariantId: string;
+  };
+  data: {
+    amount: number;
+  };
+}
+
+interface CartNewVariantData {
+  id: string;
+  itemVariantId: string;
+  amount: number;
+}
+
 interface ChangeCartParams {
   cartId: string;
   itemVariant: {
@@ -30,7 +57,118 @@ interface DeleteCartParams {
   cartVariantId: string;
 }
 
-const _verifyCartAccess = async ({ userId, cartId }: { userId: string, cartId: string }) => {
+const _checkIfVariantExist = async (cartId: string) => {
+  const variant = await prisma.cartVariant.findFirst({
+    where: {
+      cartId,
+    },
+  });
+
+  if (!variant) {
+    await prisma.cart.delete({
+      where: {
+        id: cartId,
+      },
+    });
+  }
+}
+
+const _checkIfItemAlreadyInCart = async (userId: string, itemId: string) => {
+  const cart = await prisma.cart.findFirst({
+    where: {
+      itemId,
+      userId,
+    },
+    select: {
+      id: true,
+      cartVariant: {
+        select: {
+          amount: true,
+          itemVariant: {
+            select: {
+              id: true,
+              label: true,
+              stock: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return cart;
+}
+
+const _addNewVariantItemToCart = async (cartData: CartData, { itemId, itemVariant }: CartParams) => {
+  const cartNewVariantData: CartNewVariantData[] = [];
+
+  const cartUpdatedVariantData: CartUpdatedVariantData[] = [];
+
+  await Promise.all(itemVariant.map(async ({ id, amount }) => {
+    const { stock, label } = await getItemVariantStockById(itemId, id);
+
+    const existingVariant = cartData.cartVariant.find(
+      ({ itemVariant }) => itemVariant.id === id
+    );
+
+    if (existingVariant) {
+      const variantAmount = amount + existingVariant.amount;
+
+      if (variantAmount > stock) {
+        throw new InvariantError(`Stock item variant ${label} tidak cukup`);
+      }
+
+      cartUpdatedVariantData.push({
+        where: {
+          itemVariantId: id,
+        },
+        data: {
+          amount: variantAmount,
+        },
+      });
+
+      return;
+    }
+
+    if (amount > stock) {
+      throw new InvariantError(`Stock item variant ${label} tidak cukup`);
+    }
+
+    const cartVariantId = `cartVariant-${nanoid(16)}`;
+
+    cartNewVariantData.push({
+      id: cartVariantId,
+      itemVariantId: id,
+      amount,
+    });
+
+    return;
+  }));
+
+
+  const cart = await prisma.cart.update({
+    where: {
+      id: cartData.id,
+    },
+    data: {
+      cartVariant: {
+        updateMany: cartUpdatedVariantData,
+        createMany: {
+          data: cartNewVariantData,
+        },
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!cart) {
+    throw new InvariantError("Gagal menambahkan variasi item");
+  }
+}
+
+export const verifyCartAccess = async ({ userId, cartId }: { userId: string, cartId: string }) => {
   const cart = await prisma.cart.findFirst({
     where: {
       id: cartId,
@@ -56,24 +194,15 @@ const _verifyCartAccess = async ({ userId, cartId }: { userId: string, cartId: s
   return cart.item.id;
 }
 
-const _checkIfVariantExist = async (cartId: string) => {
-  const variant = await prisma.cartVariant.findFirst({
-    where: {
-      cartId,
-    },
-  });
-
-  if (!variant) {
-    await prisma.cart.delete({
-      where: {
-        id: cartId,
-      },
-    });
-  }
-}
-
 export const addItemToCart = async (userId: string, { itemId, itemVariant }: CartParams) => {
-  const title = await checkIfTheItemAvailable(itemId);
+  const { title } = await checkIfTheItemAvailable(itemId);
+
+  const cartData = await _checkIfItemAlreadyInCart(userId, itemId);
+
+  if (cartData) {
+    await _addNewVariantItemToCart(cartData, { itemId, itemVariant });
+    return title;
+  }
 
   const cartId = `cart-${nanoid(16)}`;
 
@@ -132,14 +261,17 @@ export const getCartItems = async (userId: string) => {
       }
     },
     select: {
+      id: true,
       item: {
         select: {
+          id: true,
           title: true,
           seller: {
             select: {
               city: true,
               user: {
                 select: {
+                  username: true,
                   image: true,
                 },
               },
@@ -155,6 +287,7 @@ export const getCartItems = async (userId: string) => {
       },
       cartVariant: {
         select: {
+          id: true,
           amount: true,
           itemVariant: {
             select: {
@@ -174,7 +307,7 @@ export const getCartItems = async (userId: string) => {
 }
 
 export const changeAmountItemCartVariant = async (userId: string, { cartId, itemVariant }: ChangeCartParams) => {
-  const itemId = await _verifyCartAccess({ userId, cartId });
+  const itemId = await verifyCartAccess({ userId, cartId });
 
   const cartVariantData = await Promise.all(itemVariant.map(async ({ id, amount }) => {
     const { stock, label } = await getItemVariantStockById(itemId, id);
@@ -210,7 +343,7 @@ export const changeAmountItemCartVariant = async (userId: string, { cartId, item
 }
 
 export const deleteItemVariantOnCart = async (userId: string, { cartId, cartVariantId }: DeleteCartParams) => {
-  await _verifyCartAccess({ userId, cartId });
+  await verifyCartAccess({ userId, cartId });
 
   const cart = await prisma.cartVariant.delete({
     where: {
@@ -232,4 +365,73 @@ export const deleteItemVariantOnCart = async (userId: string, { cartId, cartVari
   await _checkIfVariantExist(cartId);
 
   return cart.itemVariant.label;
+}
+
+export const deleteOrderedCartById = async (cartId: string) => {
+  const verify = await prisma.cart.delete({
+    where: {
+      id: cartId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!verify) {
+    throw new InvariantError("Gagal menghapus cart!")
+  }
+}
+
+export const deleteOrderedItemVariantCartById = async (cartVariant: string[]) => {
+  const verify = await prisma.cartVariant.deleteMany({
+    where: {
+      id: {
+        in: cartVariant,
+      },
+    },
+  });
+
+  if (!verify) {
+    throw new InvariantError("Gagal menghapus cart");
+  }
+}
+
+export const getOrderDataCart = async (cartId: string, cartVariantId: string[] | undefined) => {
+  const cartData = await prisma.cart.findUnique({
+    where: {
+      id: cartId,
+    },
+    select: {
+      itemId: true,
+      cartVariant: {
+        select: {
+          id: true,
+          amount: true,
+          itemVariant: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!cartData) {
+    throw new InvariantError("Gagal mendapatkan data cart");
+  }
+
+  if (cartVariantId) {
+    cartData.cartVariant = cartData.cartVariant.filter(({ id }) => cartVariantId.includes(id));
+  }
+
+  return {
+    itemId: cartData.itemId,
+    itemVariant: cartData.cartVariant.map(({ itemVariant, amount }) => {
+      return {
+        id: itemVariant.id,
+        amount: amount
+      };
+    }),
+  };
 }

@@ -58,3 +58,22 @@ export const editUserProfile = async (userId: string, {
 
   return data;
 }
+
+export const checkUserPhoneNumber = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      phoneNumber: true,
+    },
+  });
+
+  if (!user) {
+    throw new NotFoundError("User tidak ditemukan");
+  }
+
+  if (!user.phoneNumber) {
+    throw new InvariantError("Tambahkan Nomor telephone sebelum melanjutkan!")
+  }
+}
