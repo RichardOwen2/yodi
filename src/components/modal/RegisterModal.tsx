@@ -18,8 +18,8 @@ import Input from "../inputs/Input";
 import Button from "../Button";
 import useRegisterModal from "@/hooks/useRegisterModal";
 import useLoginModal from "@/hooks/useLoginModal";
-import { setCookie } from "cookies-next";
 import { BASEAPIURL } from "@/config";
+import { setToken } from "@/utils/auth"
 
 const RegisterModal= () => {
   const registerModal = useRegisterModal();
@@ -45,7 +45,7 @@ const RegisterModal= () => {
     axios.post(`${BASEAPIURL}/register`,{
       ...data
     }).then((response)=>{
-      setCookie("YODI_TOKEN", response.data.data.token)
+      setToken(response.data.data.token)
       toast.success('Berhasil mendaftar');
       registerModal.onClose();
     }).catch((error)=>{

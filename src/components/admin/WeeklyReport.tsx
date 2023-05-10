@@ -4,7 +4,7 @@ import Button from "../Button";
 
 const WeeklyReport = () => {
   return (
-    <div className="h-40 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 m-10 relative p-5 rounded-xl">
+    <div className="h-52 bg-[url('/images/stocks2.jpg')] bg-no-repeat bg-cover m-10 relative p-5 rounded-xl">
       <p className="text-lg font-bold">Weekly Report</p>
       <button 
         onClick={() => {}}

@@ -12,15 +12,12 @@ import { FcGoogle } from "react-icons/fc";
 import { AiFillGithub } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import axios from 'axios';
-
 import useLoginModal from "@/hooks/useLoginModal";
-
 import Modal from "./Modal";
 import Input from "../inputs/Input";
-import Button from "../Button";
 import { BASEAPIURL } from "@/config";
-import { setCookie, setCookies } from "cookies-next";
 import useRegisterModal from "@/hooks/useRegisterModal";
+import { setToken } from "@/utils/auth"
 
 const LoginModal = () => {
   const router = useRouter();
@@ -47,7 +44,7 @@ const LoginModal = () => {
     axios.post(`${BASEAPIURL}/login`,{
       ...data
     }).then((response)=>{
-      setCookie("YODI_TOKEN", response.data.data.token)
+      setToken(response.data.data.token)
       toast.success('Logged in');
       loginModal.onClose();
     }).catch((error)=>{
