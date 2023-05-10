@@ -106,3 +106,73 @@ export const getTopSeller = async () => {
 
   return sellers;
 }
+
+export const getSellerDetailById = async (id: string) => {
+  const seller = await prisma.seller.findFirst({
+    where: {
+      id,
+      verifiedAt: {
+        not: null,
+      },
+    },
+    select: {
+      id: true,
+      city: true,
+      soldCount: true,
+      user: {
+        select: {
+          username: true,
+          image: true,
+        },
+      },
+    },
+  });
+
+  if (!seller) {
+    throw new NotFoundError("Seller tidak ditemukan");
+  }
+
+  return seller;
+}
+
+export const getItemBySellerId = async (id: string, { page, itemCount }: PaginationParams) => {
+  const items = await prisma.seller.findMany({
+    where: {
+      id,
+      verifiedAt: {
+        not: null,
+      },
+    },
+    select: {
+      item: {
+        skip: itemCount * (page - 1),
+        take: itemCount,
+        where: {
+          verifiedAt: {
+            not: null,
+          },
+        },
+        select: {
+          id: true,
+          title: true,
+          itemImage: {
+            take: 1,
+            select: {
+              image: true,
+            },
+          },
+          itemVariant: {
+            orderBy: {
+              price: 'asc',
+            },
+            select: {
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return items;
+}

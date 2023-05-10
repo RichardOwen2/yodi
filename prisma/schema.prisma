@@ -64,14 +64,15 @@ model User {
 }
 
 model UserAddress {
-  id        String   @id
-  userId    String
-  label     String
-  city      String
-  address   String
-  note      String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id         String   @id
+  userId     String
+  label      String
+  city       String
+  postalCode String   @map("postcal_code")
+  address    String
+  note       String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -202,6 +203,7 @@ model ItemOrder {
   itemNote     String   @map("item_note")
   city         String
   address      String
+  postalCode   String
   addressNote  String?  @map("address_note")
   shipper      String
   shipperPrice Int      @map("shipper_price")
@@ -259,10 +261,13 @@ model ItemOrderStatus {
 }
 
 model ItemOrderPayment {
-  transactionId String  @id @map("transaction_id")
-  itemOrderId   String  @unique @map("item_order_id")
-  paymentStatus String  @map("payment_status")
-  note          String?
+  id            String   @id
+  itemOrderId   String   @unique @map("item_order_id")
+  token         String
+  redirectUrl   String   @map("redirect_url")
+  paymentStatus String   @default("PENDING") @map("payment_status")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   itemOrder ItemOrder @relation(fields: [itemOrderId], references: [id], onDelete: Cascade)
 }
