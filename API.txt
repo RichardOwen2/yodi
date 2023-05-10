@@ -384,7 +384,7 @@ Menghapus itemVariant dalam cart
   - dapat dihapus meskipun seller terbanned
   - jika semua variant item dihapus maka cart terhapus otomatis
 
-
+  
 Mendapatkan list item checkout/order
   GET API/USER/ORDER?page=x&itemCount=x&search=x
 

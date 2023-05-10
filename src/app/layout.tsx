@@ -1,7 +1,10 @@
-import Navbar from '@/components/navbar/Navbar'
 import './globals.css'
-import LoginModal from '@/components/modal/LoginModal'
 import AuthContext from '@/context/AuthContext'
+import ToasterProvider from '@/providers/ToasterProvider'
+import Navbar from '@/components/dashboard/navbar/Navbar'
+import LoginModal from '@/components/modal/LoginModal'
+import RegisterModal from '@/components/modal/RegisterModal'
+
 
 export const metadata = {
   title: 'YODI',
@@ -17,8 +20,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthContext>
-          <Navbar />
           <LoginModal />
+          <RegisterModal />
+          <ToasterProvider />
           {children}
         </AuthContext>
       </body>
