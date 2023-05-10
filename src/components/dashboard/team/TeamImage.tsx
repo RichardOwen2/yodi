@@ -1,11 +1,11 @@
 'use client'
 
 import Link from "next/link";
-import Avatar from "./Avatar";
+import Avatar from "../../Avatar";
 import { RiFacebookBoxFill, RiLinkedinBoxFill, RiTwitterLine } from "react-icons/ri"
 
 interface TeamImageProps {
-  src?: string | null | undefined;
+  src?: string;
   name: string;
   jobdesk: string;
   linkedin: string;
@@ -24,7 +24,7 @@ const TeamImage: React.FC<TeamImageProps> = ({
   return (
     <div className="md:w-1/3 lg:w-1/5 flex justify-center mx-20 xl:pb-10 pb-16 items-center inset-0 transform hover:scale-125 transition duration-300 drop-shadow-xl">
       <div className="bg-[#EFEB79] px-10 py-5 rounded-xl border-2 border-black">
-        <Avatar src={src} />
+        <Avatar src={src} center={true} />
 
         {/* Body */}
         <div className="text-center pt-3">

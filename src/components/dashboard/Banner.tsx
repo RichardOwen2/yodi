@@ -7,12 +7,15 @@ import { AiOutlineArrowDown } from 'react-icons/ai'
 const Banner = () => {
   return (
     <div className="bg-[#EFEB79] pt-36 pb-20 sm:px-20 md:px-36 relative">
-      <div className="bg-white flex flex-row py-12 px-28 md:rounded-tr-[150px] md:rounded-bl-[150px]">
-        <div className="text-black w-3/4">
+      <div className="block md:hidden bg-white mx-10">
+      <Image src="/images/design_clothes.png" alt="" width="300" height="40" className="mx-auto" />
+      </div>
+      <div className="md:bg-white md:flex flex-row py-12 md:px-28 md:rounded-tr-[150px] md:rounded-bl-[150px]">
+        <div className="text-black md:w-3/4">
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel fugiat exercitationem laudantium iste amet maiores numquam ratione placeat alias, quibusdam odio ducimus dolor est? Doloribus eaque laudantium vel quas saepe?
           </p>
-          <div className="mt-20 flex flex-row">
+          <div className="md:mt-20 flex flex-row">
             <div className="mx-2">
               <Image src="/images/iphone_download.png" alt="" width="160" height="100" />
             </div>
@@ -21,7 +24,7 @@ const Banner = () => {
             </div>
           </div>
         </div>
-        <div className="px-5 w-1/2">
+        <div className="hidden md:block px-5 md:w-1/2">
           <Image src="/images/design_clothes.png" alt="" width="300" height="40" className="mx-auto" />
         </div>
       </div>
