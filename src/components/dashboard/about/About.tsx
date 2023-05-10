@@ -16,10 +16,10 @@ const About = () => {
         </div>
         <div className="bg-[#D9D9D9] md:w-1/2 text-black">
           <div className="md:p-5 grid grid-cols-2 md:grid-cols-3 gap-4 justify-items-center">
-              <TopSeller name={"BPN Sablon"} location={"Balikpapan"} src={undefined} />
-              <TopSeller name={"BPN Sablon"} location={"Balikpapan"} src={undefined} />
-              <TopSeller name={"BPN Sablon"} location={"Balikpapan"} src={undefined} />
-              <TopSeller name={"BPN Sablon"} location={"Balikpapan"} src={undefined} />
+              <TopSeller name={"BPN Sablon"} city={"Balikpapan"} src={undefined} />
+              <TopSeller name={"BPN Sablon"} city={"Balikpapan"} src={undefined} />
+              <TopSeller name={"BPN Sablon"} city={"Balikpapan"} src={undefined} />
+              <TopSeller name={"BPN Sablon"} city={"Balikpapan"} src={undefined} />
           </div>
           <div className="p-10 bg-[#EFEB79] text-center font-bold text-sm md:text-xl">YODI TOP SELLER</div>
           <div className="pr-2 bg-[#EFEB79] text-right text-lg">Learn More</div>

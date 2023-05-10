@@ -35,7 +35,7 @@ interface orderVariantDataType {
 export const orderItem = async (userId: string, { addressId, shipperId, itemId, itemVariant, itemNote }: OrderParams) => {
   await checkUserPhoneNumber(userId);
 
-  const { city, address, note } = await getAddressById(userId, { addressId });
+  const { city, address, postalCode, note } = await getAddressById(userId, { addressId });
   const { name, price: shipperPrice } = await getShipperById(shipperId);
 
   const { title, sellerId, description, itemImage } = await checkIfTheItemAvailable(itemId);
@@ -93,6 +93,7 @@ export const orderItem = async (userId: string, { addressId, shipperId, itemId, 
       sellerId,
       city,
       address,
+      postalCode,
       addressNote: note,
       shipper: name,
       shipperPrice,

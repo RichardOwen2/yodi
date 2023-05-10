@@ -64,7 +64,7 @@ export default function AuthContext({ children }: Props) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
 
       setLoading(false);
-      setData(response.data);
+      setData(response.data.data);
       setError(null);
 
     } catch (error: any) {

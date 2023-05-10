@@ -1,55 +1,53 @@
 'use client';
 
+import axios from "axios";
+import { AiFillGithub } from "react-icons/ai";
+import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
 import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
-import { signIn } from 'next-auth/react';
-import {
-  FieldValues,
+import { 
+  FieldValues, 
   SubmitHandler,
   useForm
 } from "react-hook-form";
-import { FcGoogle } from "react-icons/fc";
-import { AiFillGithub } from "react-icons/ai";
-import { useRouter } from "next/navigation";
-import axios from 'axios';
 
-import useLoginModal from "@/hooks/useLoginModal";
 
 import Modal from "./Modal";
 import Input from "../inputs/Input";
 import Button from "../Button";
-import { BASEAPIURL } from "@/config";
-import { setCookie, setCookies } from "cookies-next";
 import useRegisterModal from "@/hooks/useRegisterModal";
+import useLoginModal from "@/hooks/useLoginModal";
+import { setCookie } from "cookies-next";
+import { BASEAPIURL } from "@/config";
 
-const LoginModal = () => {
-  const router = useRouter();
-  const loginModal = useLoginModal();
+const RegisterModal= () => {
   const registerModal = useRegisterModal();
+  const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    register,
+  const { 
+    register, 
     handleSubmit,
     formState: {
       errors,
     },
   } = useForm<FieldValues>({
     defaultValues: {
+      username: '',
       email: '',
       password: ''
     },
   });
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
-  
     setIsLoading(true);
-    axios.post(`${BASEAPIURL}/login`,{
+    axios.post(`${BASEAPIURL}/register`,{
       ...data
     }).then((response)=>{
       setCookie("YODI_TOKEN", response.data.data.token)
-      toast.success('Logged in');
-      loginModal.onClose();
+      toast.success('Berhasil mendaftar');
+      registerModal.onClose();
     }).catch((error)=>{
       toast.error(error.response.data.message);
     });
@@ -57,24 +55,31 @@ const LoginModal = () => {
   }
 
   const onToggle = useCallback(() => {
-    loginModal.onClose();
-    registerModal.onOpen();
-  }, [loginModal, registerModal])
+    registerModal.onClose();
+    loginModal.onOpen();
+  }, [registerModal, loginModal])
 
   const bodyContent = (
     <div className="flex flex-col gap-4">
-
       <Input
-        id="email"
-        label="Email"
+        label="Username"
+        id="username"
         disabled={isLoading}
         register={register}
         errors={errors}
         required
       />
       <Input
-        id="password"
+        label="Email"
+        id="email"
+        disabled={isLoading}
+        register={register}
+        errors={errors}
+        required
+      />
+      <Input
         label="Password"
+        id="password"
         type="password"
         disabled={isLoading}
         register={register}
@@ -87,16 +92,23 @@ const LoginModal = () => {
   const footerContent = (
     <div className="flex flex-col gap-4 mt-3">
       <hr />
-      <div className="text-neutral-500 text-center mt-4 font-light">
-        <p>Pertama kali menggunakan yodi ?
-          <span
-            onClick={onToggle}
+      <div 
+        className="
+          text-neutral-500 
+          text-center 
+          mt-4 
+          font-light
+        "
+      >
+        <p>Already have an account?
+          <span 
+            onClick={onToggle} 
             className="
-              text-blue-800
+              text-neutral-800
               cursor-pointer 
               hover:underline
             "
-          > Download apps</span>
+            > Log in</span>
         </p>
       </div>
     </div>
@@ -105,10 +117,10 @@ const LoginModal = () => {
   return (
     <Modal
       disabled={isLoading}
-      isOpen={loginModal.isOpen}
-      title="Login"
+      isOpen={registerModal.isOpen}
+      title="Register"
       actionLabel="Continue"
-      onClose={loginModal.onClose}
+      onClose={registerModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
       footer={footerContent}
@@ -116,4 +128,4 @@ const LoginModal = () => {
   );
 }
 
-export default LoginModal;
+export default RegisterModal;

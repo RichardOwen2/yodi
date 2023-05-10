@@ -126,7 +126,7 @@ Mendapatkan Data Item Berdasarkan list seller
             username: string;
             image: string | null;
         };
-        item: [ //kenapa item? karna penamaan database bukan gk konsisten hengki kontol
+        item: [
             {
                 id: string,
                 title: string,
@@ -193,6 +193,53 @@ Mendapatkan Data Item By Id (hanya menampilkan item yang sudah diverifikasi oleh
   - item tidak ditemukan
 
 
+Mendapatkan data diri seller by id
+  GET API/SELLER/[id]
+
+  Response Data = {
+      seller: {
+        id: string;
+        user: {
+            username: string;
+            image: string | null;
+        };
+        city: string;
+        soldCount: number;
+    }
+  }
+
+  fail :
+  - id tidak ditemukan
+  - seller tidak terverifikasi
+
+
+Mendapatkan item by seller id
+  GET API/SELLER/[id]/ITEM
+
+  Response Data = {
+    items: [
+        {
+          item: {
+            id: string;
+            itemImage: [
+              {
+                image: string
+              }, // image hanya muncul 1
+            ],
+            itemVariant: [
+              {
+                price: number;
+              }, // price diurutkan berdasarkan termurah
+              { ... }
+            ],
+            title: string;
+          }
+        },
+        { ... },
+    ]
+  };
+
+  
 Mendapatkan Top Seller
   GET API/SELLER/TOP
 
@@ -224,6 +271,7 @@ Mendapatkan Shipper
       { ... }
     ]
   }
+
 
 ------ USER ------
 
@@ -270,6 +318,7 @@ Menambahkan alamat pengiriman
     label: string,
     city: string,
     address: string,
+    postalCode: string,
     note: string | undefined
   }
 
@@ -285,6 +334,7 @@ Mendapatkan list alamat pengiriman
         id: string,
         label: string;
         city: string;
+        postalCode: string;
         address: string;
         note: string | null;
       },
@@ -300,6 +350,7 @@ Mengedit alamat pengiriman
     addressId: string,
     label: string | undefined,
     city: string | undefined,
+    postalCode: string | undefined,
     address: string | undefined,
     note: string | undefined
   }
@@ -544,6 +595,18 @@ Melakukan checkout/order item
   - seller terbanned
   - user harus sudah mendaftarkan nomor telephone
 
+
+Melakukan request payment
+  POST API/USER/PAYMENT
+
+  Body Request : {
+    orderId: string;
+  }
+
+  fail :
+  - jika sudah ada payment yang berlangsung dan belum expire
+  - order tidak ditemukan
+  - user tidak memiliki akses order
 
 
 ------ SELLER ------

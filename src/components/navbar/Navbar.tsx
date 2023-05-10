@@ -1,22 +1,20 @@
 import Container from "../Container";
-import Logo from "./Logo";
-import Search from "./Search";
+import Logo from "../Logo";
+import Heading from "./Heading";
 import UserMenu from "./UserMenu";
 
+interface NavbarProps {
+  button?: boolean;
+}
+
 const Navbar = () => {
-  return ( 
-    <div className="fixed w-full bg-[#EFEB79] bg-opacity-80 z-10 shadow-sm">
-      <div className="border-b-[1px] border-black">
-      <Container>
-        <div 
-          className="flex flex-row items-center justify-between gap-3 md:gap-0">
-          <Logo />
-          <Search />
-          <UserMenu />
-        </div>
-      </Container>
+  return (
+    <div>
+      <div className="flex flex-row justify-between">
+        <Heading authName="Admin" />
+        <UserMenu />
+      </div>
     </div>
-  </div>
   );
 }
 
