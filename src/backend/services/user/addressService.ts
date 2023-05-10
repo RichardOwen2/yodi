@@ -10,6 +10,7 @@ interface addAddressParams {
   label: string;
   city: string;
   address: string;
+  postalCode: string;
   note: string;
 }
 
@@ -18,6 +19,7 @@ interface editAddressParams {
   label: string;
   city: string;
   address: string;
+  postalCode: string;
   note: string;
 }
 
@@ -40,7 +42,7 @@ const _verifyAddressAccess = async (userId: string, addressId: string) => {
   }
 }
 
-export const addAddress = async (userId: string, { label, city, address, note = "" }: addAddressParams) => {
+export const addAddress = async (userId: string, { label, city, address, postalCode, note = "" }: addAddressParams) => {
   const id = `address-${nanoid(16)}`;
 
   const userAddress = await prisma.userAddress.create({
@@ -51,6 +53,7 @@ export const addAddress = async (userId: string, { label, city, address, note = 
       city,
       address,
       note,
+      postalCode,
     },
     select: {
       id: true,
@@ -68,6 +71,7 @@ export const getAddress = async (userId: string) => {
       userId,
     },
     select: {
+      id: true,
       label: true,
       city: true,
       address: true,
@@ -78,12 +82,13 @@ export const getAddress = async (userId: string) => {
   return address;
 }
 
-export const editAddress = async (userId: string, { addressId, label, city, address, note }: editAddressParams) => {
+export const editAddress = async (userId: string, { addressId, label, city, postalCode, address, note }: editAddressParams) => {
   await _verifyAddressAccess(userId, addressId);
 
   const data = Object.assign({},
     label && { label },
     city && { city },
+    postalCode && { postalCode },
     address && { address },
     note && { note },
   );
@@ -127,6 +132,7 @@ export const getAddressById = async (userId: string, { addressId }: { addressId:
     select: {
       label: true,
       city: true,
+      postalCode: true,
       address: true,
       note: true,
     },

@@ -28,7 +28,75 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      sold: 'desc',
+    },
+    select: {
+      seller: {
+        select: {
+          city: true,
+          user: {
+            select: {
+              username: true,
+              image: true,
+            }
+          }
+        },
+      },
+      id: true,
+      title: true,
+      description: true,
+      sold: true,
+      itemImage: {
+        take: 1,
+        select: {
+          image: true,
+        },
+      },
+      itemVariant: {
+        select: {
+          price: true,
+        },
+        orderBy: {
+          price: 'asc'
+        },
+      },
+      _count: {
+        select: {
+          itemVariant: true,
+        },
+      },
+    },
+  });
+
+  return items;
+}
+
+export const getItemsBySearch = async (search: string, { page, itemCount }: PaginationParams) => {
+  if (page < 1 || itemCount < 1) {
+    throw new InvariantError("Page dan itemcount tidak boleh kurang dari 1");
+  }
+
+  const items = await prisma.item.findMany({
+    skip: itemCount * (page - 1),
+    take: itemCount,
+    where: {
+      seller: {
+        verifiedAt: {
+          not: null,
+        },
+        user: {
+          status: AccountStatus.ACTIVE,
+        }
+      },
+      verifiedAt: {
+        not: null,
+      },
+      title: {
+        contains: search,
+      },
+    },
+    orderBy: {
+      sold: 'desc',
     },
     select: {
       seller: {
@@ -68,7 +136,7 @@ export const getItems = async ({ page, itemCount }: PaginationParams) => {
   return items;
 }
 
-export const getItemsBySearch = async (search: string, { page, itemCount }: PaginationParams) => {
+export const getItemsBySeller = async (seller: string, { page, itemCount }: PaginationParams) => {
   if (page < 1 || itemCount < 1) {
     throw new InvariantError("Page dan itemcount tidak boleh kurang dari 1");
   }
@@ -83,17 +151,17 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
         },
         user: {
           status: AccountStatus.ACTIVE,
-        }
+          username: {
+            contains: seller,
+          },
+        },
       },
       verifiedAt: {
         not: null,
       },
-      title: {
-        contains: search,
-      },
     },
     orderBy: {
-      createdAt: 'desc',
+      sold: 'desc',
     },
     select: {
       seller: {
@@ -120,6 +188,77 @@ export const getItemsBySearch = async (search: string, { page, itemCount }: Pagi
       itemVariant: {
         select: {
           price: true,
+        },
+      },
+      _count: {
+        select: {
+          itemVariant: true,
+        },
+      },
+    },
+  });
+
+  return items;
+}
+
+export const getItemsBySellerAndSearch = async (search: string, seller: string, { page, itemCount }: PaginationParams) => {
+  if (page < 1 || itemCount < 1) {
+    throw new InvariantError("Page dan itemcount tidak boleh kurang dari 1");
+  }
+
+  const items = await prisma.item.findMany({
+    skip: itemCount * (page - 1),
+    take: itemCount,
+    where: {
+      seller: {
+        verifiedAt: {
+          not: null,
+        },
+        user: {
+          status: AccountStatus.ACTIVE,
+          username: {
+            contains: seller,
+          },
+        },
+      },
+      verifiedAt: {
+        not: null,
+      },
+      title: {
+        contains: search,
+      },
+    },
+    orderBy: {
+      sold: 'desc',
+    },
+    select: {
+      seller: {
+        select: {
+          city: true,
+          user: {
+            select: {
+              username: true,
+              image: true,
+            }
+          }
+        },
+      },
+      id: true,
+      title: true,
+      description: true,
+      sold: true,
+      itemImage: {
+        take: 1,
+        select: {
+          image: true,
+        },
+      },
+      itemVariant: {
+        select: {
+          price: true,
+        },
+        orderBy: {
+          price: 'asc'
         },
       },
       _count: {
@@ -169,6 +308,7 @@ export const getItemById = async (itemId: string) => {
       },
       itemVariant: {
         select: {
+          id: true,
           label: true,
           price: true,
           stock: true,
