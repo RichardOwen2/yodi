@@ -4,6 +4,7 @@ import ToasterProvider from '@/providers/ToasterProvider'
 import Navbar from '@/components/dashboard/navbar/Navbar'
 import LoginModal from '@/components/modal/LoginModal'
 import RegisterModal from '@/components/modal/RegisterModal'
+import ClientOnly from '@/components/ClientOnly'
 
 
 export const metadata = {
@@ -19,12 +20,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthContext>
-          <LoginModal />
-          <RegisterModal />
-          <ToasterProvider />
-          {children}
-        </AuthContext>
+        <ClientOnly>
+          <AuthContext>
+            <LoginModal />
+            <RegisterModal />
+            <ToasterProvider />
+            {children}
+          </AuthContext>
+        </ClientOnly>
       </body>
     </html>
   )

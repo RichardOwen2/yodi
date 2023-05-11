@@ -2,9 +2,8 @@ import UserTable from "@/components/admin/user/UserTable";
 import Navbar from "@/components/navbar/Navbar";
 import Sidebar from "@/components/sidebar/Sidebar";
 
-
 const Item = () => {
-  return ( 
+  return (
     <div className="bg-[#F5F5F5] flex">
       <Sidebar />
 
@@ -14,7 +13,7 @@ const Item = () => {
         <UserTable />
       </div>
     </div>
-   );
+  );
 }
- 
+
 export default Item;

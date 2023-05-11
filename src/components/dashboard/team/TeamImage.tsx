@@ -11,6 +11,7 @@ interface TeamImageProps {
   linkedin: string;
   twitter: string;
   facebook: string;
+  rounded?: boolean;
 }
 
 const TeamImage: React.FC<TeamImageProps> = ({
@@ -19,12 +20,13 @@ const TeamImage: React.FC<TeamImageProps> = ({
   jobdesk,
   linkedin,
   twitter,
-  facebook
+  facebook,
+  rounded,
 }) => {
   return (
     <div className="md:w-1/3 lg:w-1/5 flex justify-center mx-20 xl:pb-10 pb-16 items-center inset-0 transform hover:scale-125 transition duration-300 drop-shadow-xl">
       <div className="bg-[#EFEB79] px-10 py-5 rounded-xl border-2 border-black">
-        <Avatar src={src} center={true} />
+        <Avatar src={src} center={true} rounded={rounded} />
 
         {/* Body */}
         <div className="text-center pt-3">

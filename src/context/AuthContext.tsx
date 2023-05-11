@@ -6,6 +6,7 @@ import axios from 'axios';
 import { AccountStatus } from '@prisma/client';
 
 import { BASEAPIURL } from '@/config';
+import { getToken } from '@/utils/auth';
 
 interface Props {
   children: React.ReactNode,
@@ -46,7 +47,7 @@ export default function AuthContext({ children }: Props) {
 
   const fetchUser = async () => {
     try {
-      const jwt = getCookie("jwt");
+      const jwt = getToken();
 
       if (!jwt) {
         setLoading(false);

@@ -9,18 +9,26 @@ import { MdOutlinePageview } from 'react-icons/md';
 
 import { BASEAPIURL } from "@/config";
 import axios from "axios";
-import {getToken} from "@/utils/auth"
-import { getCookie } from 'cookies-next';
+import { getToken } from "@/utils/auth"
+import { useEffect, useState } from 'react';
 
 const columns: GridColDef[] = [
-  { field: 'id', headerName: 'ID', flex: 1, headerClassName: 'font-bold', },
-  { field: 'title', headerName: 'Title', flex: 1, headerClassName: 'font-bold', },
-  { field: 'seller', headerName: 'Seller Name', flex: 1, headerClassName: 'font-bold', },
-  { field: 'created_at', headerName: 'diajukan pada', flex: 1, headerClassName: 'font-bold', },
+  { field: 'title', headerName: 'Title', minWidth: 100, flex: 1, maxWidth: 380, headerClassName: 'font-bold', },
+  { 
+    field: 'seller',
+    headerName: 'Seller Name',
+    minWidth: 100, flex: 1, 
+    maxWidth: 380,
+    headerClassName: 'font-bold',
+    valueGetter: (params) => `${params.row.seller.user.username}`,
+  },
+
+  { field: 'createdAt', headerName: 'diajukan pada', minWidth: 100, flex: 1, maxWidth: 380, headerClassName: 'font-bold', },
   {
     field: 'detail',
     headerName: 'Detail',
-    flex: 1,
+    minWidth: 100, flex: 1, 
+    maxWidth: 380,
     headerClassName: 'font-bold',
     renderCell: (params) => (
       <button
@@ -36,19 +44,6 @@ const columns: GridColDef[] = [
 ];
 
 
-const datas = () => {
-  axios.get(`${BASEAPIURL}/admin/item?page=1&itemCount=500`, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  }).then((response) => {
-    console.log(response.s.data.item)
-    return response.data.data.item
-  }).catch((error) => {
-    console.log(error.response.data.message);
-  });
-}
-
 const rows = [
   { id: 1, title: 'Snow', seller: 'Jon', created_at: "2022-08-13 03:49:39", },
   { id: 2, title: 'Lannister', seller: 'Cersei', created_at: "2022-08-13 03:49:39", },
@@ -62,6 +57,8 @@ const rows = [
 ];
 
 export default function ItemTable() {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const {
     register,
@@ -71,10 +68,29 @@ export default function ItemTable() {
     },
   } = useForm<FieldValues>({
     defaultValues: {
-      email: '',
-      password: ''
+      search: '',
     },
   });
+
+  useEffect(() => {
+    const fetchItem = async () => {
+      axios.get(`${BASEAPIURL}/admin/item?page=1&itemCount=500`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
+      }).then((response) => {
+        console.log(response);
+        setRows(response.data.data.items);
+        setLoading(false);
+      }).catch((error) => {
+        console.log(error.response.data.message);
+      });
+    }
+    fetchItem();
+  }, []);
+
+
+
   return (
     <div className="w-full my-10 bg-white p-10">
       <div className="md:flex flex-row justify-between my-5">
@@ -94,6 +110,7 @@ export default function ItemTable() {
           },
         }}
         pageSizeOptions={[5, 10]}
+        loading={loading}
       // checkboxSelection
       />
     </div>

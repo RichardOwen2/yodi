@@ -7,25 +7,38 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { MdOutlinePageview } from 'react-icons/md';
 
+import { BASEAPIURL } from "@/config";
+import axios from "axios";
+import { getToken } from "@/utils/auth"
+import { useEffect, useState } from 'react';
+
 const columns: GridColDef[] = [
-  { field: 'id', headerName: 'ID', flex: 1, headerClassName: 'font-bold', },
-  { field: 'username', headerName: 'Username', flex: 1, headerClassName: 'font-bold', },
-  { field: 'status', headerName: 'Status', flex: 1, headerClassName: 'font-bold', },
-  { field: 'phoneNumber', headerName: 'Nomor Telpon', flex: 1, headerClassName: 'font-bold', },
+  { field: 'username', headerName: 'Username', flex: 1, maxWidth: 300, headerClassName: 'font-bold', },
+  { field: 'email', headerName: 'Email', flex: 1, maxWidth: 300, headerClassName: 'font-bold', },
+  {
+    field: 'status',
+    headerName: 'Status',
+    flex: 1,
+    maxWidth: 300,
+    headerClassName: 'font-bold',
+    valueGetter: (params) => `${params.row.seller ? "seller" : "user"}`,
+  },
+  { field: 'phoneNumber', headerName: 'Nomor Telpon', flex: 1, maxWidth: 300, headerClassName: 'font-bold', },
   {
     field: 'detail',
     headerName: 'Detail',
     flex: 1,
+    maxWidth: 300,
     headerClassName: 'font-bold',
     renderCell: (params) => (
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-auto"
-          onClick={() => {
-            alert(`Row with id: ${params.row.id} clicked!`);
-          }}
-        >
-          <MdOutlinePageview/>
-        </button>
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-auto"
+        onClick={() => {
+          alert(`Row with id: ${params.row.id} clicked!`);
+        }}
+      >
+        <MdOutlinePageview />
+      </button>
     ),
   },
 ];
@@ -44,6 +57,9 @@ const rows = [
 
 export default function UserTable() {
 
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const {
     register,
     handleSubmit,
@@ -52,10 +68,29 @@ export default function UserTable() {
     },
   } = useForm<FieldValues>({
     defaultValues: {
-      email: '',
-      password: ''
+      search: '',
     },
   });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      axios.get(`${BASEAPIURL}/admin/account?page=1&itemCount=500`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
+      }).then((response) => {
+        console.log(response)
+        setRows(response.data.data.accounts)
+        setLoading(false);
+      }).catch((error) => {
+        console.log(error.response.data.message);
+      });
+    }
+    fetchUser();
+  }, []);
+
+
+
 
   return (
     <div className="w-full my-10 bg-white p-10">
@@ -76,7 +111,8 @@ export default function UserTable() {
           },
         }}
         pageSizeOptions={[5, 10]}
-      // checkboxSelection
+        // checkboxSelection
+        loading={loading}
       />
     </div>
   );

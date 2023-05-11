@@ -241,7 +241,7 @@ Mendapatkan item by seller id
 
   
 Mendapatkan Top Seller
-  GET API/SELLER/TOP
+  GET z`
 
   Response Data = {
     sellers: [
