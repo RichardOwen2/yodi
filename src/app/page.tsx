@@ -6,7 +6,6 @@ import Team from "@/components/dashboard/team/Team";
 import Navbar from '@/components/dashboard/navbar/Navbar'
 import { BASEAPIURL } from "@/config";
 import axios from "axios";
-import { useEffect, useState } from "react";
 import ClientOnly from "@/components/ClientOnly";
 
 const topSeller = async () => {

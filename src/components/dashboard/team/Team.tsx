@@ -12,12 +12,12 @@ const Team = () => {
         <div className="sm:py-6 px-8 sm:24 flex flex-wrap items-center justify-center">
           <TeamImage src="/images/hengki.png" name="Hengki Agung" jobdesk="Chief Executive Officer" linkedin="" twitter="" facebook="" rounded={false} />
           <TeamImage src="/images/owen.png" name="Richard Owen" jobdesk="Chief Technology Officer" linkedin="" twitter="" facebook="" rounded={false} />
-          <TeamImage src="/images/dylan.png" name="Archie Dylan" jobdesk="CFO" linkedin="" twitter="" facebook="" rounded={false} />
+          <TeamImage src="/images/dylan.png" name="Archie Dylan" jobdesk="Chief Finance Officer" linkedin="" twitter="" facebook="" rounded={false} />
         </div>
 
         <div className="sm:py-6 px-8 sm:24 flex flex-wrap items-center justify-center">
-          <TeamImage src="/images/luthfy.png" name="Luthfy Ahmad" jobdesk="CMO" linkedin="" twitter="" facebook="" rounded={false} />
-          <TeamImage src="/images/agung.png" name="Andi Agung" jobdesk="COO" linkedin="" twitter="" facebook="" rounded={false} />
+          <TeamImage src="/images/luthfy.png" name="Luthfy Ahmad" jobdesk="Chief Operasional Officer" linkedin="" twitter="" facebook="" rounded={false} />
+          <TeamImage src="/images/agung.png" name="Andi Agung" jobdesk="Chief Marketing Officer" linkedin="" twitter="" facebook="" rounded={false} />
         </div>
 
       </div>
