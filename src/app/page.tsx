@@ -1,12 +1,13 @@
+import axios from "axios";
+
 import Achievement from "@/components/dashboard/Achievement";
 import Banner from "@/components/dashboard/Banner";
 import Footer from "@/components/dashboard/Footer";
 import About from "@/components/dashboard/about/About";
 import Team from "@/components/dashboard/team/Team";
 import Navbar from '@/components/dashboard/navbar/Navbar'
+
 import { BASEAPIURL } from "@/config";
-import axios from "axios";
-import { useEffect, useState } from "react";
 import ClientOnly from "@/components/ClientOnly";
 
 const topSeller = async () => {
