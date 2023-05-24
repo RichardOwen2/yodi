@@ -14,9 +14,12 @@ const Banner = () => {
       </div>
       <div className="lg:bg-white lg:flex flex-row py-12 lg:px-28 lg:rounded-tr-[150px] lg:rounded-bl-[150px]">
         <div className="text-black lg:w-3/4">
-          <p className="text-justify px-10">
-            YoDi adalah sebuah Startup yang bergerak dibidang fashion & craft , YoDI bekerja sebagai penengah dari pencari dan penyedia jasa sablon
-          </p>
+          <div className="text-justify px-10">
+            <h1 className="text-lg font-bold pb-3">YODI YOUR DESIGN</h1>
+            <p className="">
+              YoDi adalah sebuah Startup yang bergerak dibidang fashion & craft , YoDI bekerja sebagai penengah dari pencari dan penyedia jasa sablon
+            </p>
+          </div>
           <div className="lg:mt-20 flex flex-row justify-center md:justify-normal my-4">
             <div className="mx-2 flex flex-row hover:cursor-pointer">
               <Link href={""}>

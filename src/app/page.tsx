@@ -20,9 +20,6 @@ const topSeller = async () => {
   }
 }
 
-
-topSeller();
-
 export default async function Home() {
   const sellers = await topSeller();
 
