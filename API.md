@@ -95,7 +95,7 @@ Response Data =
 }
 ```
 
-#### Fail :
+*fail* :
 - Username dan email sudah pernah dipakai
 - email tidak valid
 - password kurang dari 8 karakter
@@ -122,7 +122,7 @@ Response =
 }
 ```
 
-#### fail:
+*fail*:
 - Kredensial salah
 
 <br>
@@ -186,7 +186,7 @@ Response Data =
 }
 ```
 
-#### fail :
+*fail* :
 - page dan itemCount kurang dari 1
 - page dan itemCount bukan number
 
@@ -306,7 +306,7 @@ Response Data =
 }
 ```
 
-#### fail:
+*fail*:
 - item tidak ditemukan
 
 
@@ -335,7 +335,7 @@ Response Data =
 }
 ```
 
-#### fail :
+*fail* :
 - id tidak ditemukan
 - seller tidak terverifikasi
 
@@ -492,7 +492,7 @@ Request Body =
 
 <br>
 
-#### fail:
+*fail*:
 - username sudah digunakan *(jika mengisi username)*
 - phoneNumber berisikan value selain angka *(angka bentuk string) (jika mengisi phoneNumber)*
 
@@ -576,7 +576,7 @@ Body Request = {
 Response Message: "Berhasil mengedit alamat"
 ```
 
-#### fail :
+*fail* :
 - Bukan address miliknya
 
 <br>
@@ -599,7 +599,7 @@ Body Request = {
 Response Message: "Berhasil menghapus alamat"
 ```
 
-#### fail:
+*fail*:
 - Bukan address miliknya
 
 <br>
@@ -627,7 +627,7 @@ Request Body = {
 Response Message = "Berhasil mengajukan akun seller"
 ```
 
-#### fail:
+*fail*:
 - Sudah pernah mengajukan diri
 - Role akun bukan user
 - Bank Number minimal 8
@@ -714,7 +714,7 @@ Body Request = {
 Response Message = `Berhasil menambahkan ${title} didalam cart`
 ```
 
-#### fail : 
+*fail* : 
 - Amount lebih besar dari stock item yang tersedia
 - amount kurang dari 1
 - Item tidak ditemukan
@@ -747,7 +747,7 @@ Body Request = {
 Response Message = `Berhasil melakukan edit jumlah ${title} didalam cart`
 ```
 
-#### fail : 
+*fail* : 
 - Amount lebih besar dari stock item yang tersedia
 - amount kurang dari 1
 - Cart item tidak ditemukan
@@ -775,7 +775,7 @@ Body Request = {
 Response Message = `Berhasil menghapus ${title} didalam cart`
 ```
 
-#### fail :
+*fail* :
 - item tidak ditemukan
 - amount kurang dari 1
 
@@ -809,7 +809,7 @@ Body Request = {
   Response Message = message: `Berhasil melakukan order ${title}`
 ```
 
-#### fail :
+*fail* :
   - user harus sudah mendaftarkan nomor telephone
   - cart tidak ditemukan
   - stock item tidak cukup
@@ -906,7 +906,7 @@ Response Message = `Berhasil melakukan checkout ${title}`
 ```
 
 
-#### fail :
+*fail* :
 - item tidak ditemukan
 - amount melebihi stock item
 - amount kurang dari 1
@@ -929,7 +929,7 @@ Body Request = {
 }
 ```
 
-#### fail :
+*fail* :
 - jika sudah ada payment yang berlangsung dan belum expire
 - order tidak ditemukan
 - user tidak memiliki akses order
@@ -973,7 +973,7 @@ Response Data = user: {
 
 <br>
 
-#### fail :
+*fail* :
 - Akun seller tidak ditemukan (belum pernah diajukan)
 
 <br>
@@ -1055,7 +1055,7 @@ Response Data = {
 }
 ```
 
-#### fail :
+*fail* :
 - page dan itemCount kurang dari 1
 - page dan itemCount bukan number
 
@@ -1098,7 +1098,7 @@ Response Data = {
 }
 ```
 
-#### fail :
+*fail* :
 - Item tidak ditemukan
 
 <br>
@@ -1150,7 +1150,7 @@ Response Data = {
 }
 ```
 
-#### fail :
+*fail* :
 - page dan itemCount kurang dari 1
 - page dan itemCount bukan number
 
@@ -1182,7 +1182,7 @@ Response Data = {
 Response Message = "Seller berhasil diverifikasi"
 ```
 
-#### fail:
+*fail*:
 - Seller tidak ditemukan
 - Seller sudah diverifikasi
 
@@ -1333,7 +1333,7 @@ Response Data = {
 
 <br>
 
-#### fail:
+*fail*:
 - seller tidak ditemukan
 
 <br>
@@ -1350,7 +1350,7 @@ Response Data = {
 Response Message = "Berhasil melakukan ban terhadap akun"
 ```
 
-#### fail:
+*fail*:
 - Akun tidak ada
 - Akun sudah dibanned
 
@@ -1368,7 +1368,7 @@ Response Message = "Berhasil melakukan ban terhadap akun"
 Response Message = "Berhasil melakukan unban terhadap akun"
 ```
 
-#### fail:
+*fail*:
 - Akun tidak ada
 - Akun berstatus aktif
 
@@ -1388,7 +1388,7 @@ Response Message = "Berhasil melakukan unban terhadap akun"
 Response Message = "Item berhasil di verifikasi"
 ```
 
-#### fail:
+*fail*:
 - Item tidak ditemukan
 - Item sudah diverifikasi
 
@@ -1492,7 +1492,7 @@ Response Data = {
 }
 ```
 
-#### fail :
+*fail* :
 - jika item tidak ditemukan
 
 <br>
