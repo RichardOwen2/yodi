@@ -147,24 +147,6 @@ const itemPage = ({ params: { itemId } }: IParams) => {
               <div className="py-0.5">Penjual/Toko: <span className="text-black">{data.seller.user.username}</span></div>
             </div>
           </div>
-          <div className="mt-5">
-            <div className="flex flex-row justify-center">
-              <div className="mx-2 flex flex-row hover:cursor-pointer">
-                <Link href={""}>
-                  <FaAppStoreIos className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]" />
-                </Link>
-                <p className="font-bold text-sm md:text-xl px-3 m-auto">App Store</p>
-                {/* <Image src="/images/iphone_download.png" alt="" width="160" height="100" /> */}
-              </div>
-              <div className="mx-2 flex flex-row hover:cursor-pointer">
-                <Link href={""}>
-                  <FaGooglePlay className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]" />
-                </Link>
-                <p className="font-bold text-sm md:text-xl px-3 m-auto">Google Play</p>
-                {/* <Image src="/images/google_play_download.png" alt="" width="160" height="100" /> */}
-              </div>
-            </div>
-          </div>
         </div>
 
       </div>
