@@ -15,7 +15,6 @@ import axios from 'axios';
 import useLoginModal from "@/hooks/useLoginModal";
 import Modal from "./Modal";
 import Input from "../inputs/Input";
-import { BASEAPIURL } from "@/config";
 import useRegisterModal from "@/hooks/useRegisterModal";
 import { setToken } from "@/utils/auth"
 
@@ -41,7 +40,7 @@ const LoginModal = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
   
     setIsLoading(true);
-    axios.post(`${BASEAPIURL}/login`,{
+    axios.post(`api/login`,{
       ...data
     }).then((response)=>{
       setToken(response.data.data.token)
