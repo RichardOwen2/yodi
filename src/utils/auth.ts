@@ -1,6 +1,6 @@
 import { deleteCookie, getCookie, setCookie } from "cookies-next"
 
-export const setToken = (token: any) => {
+export const setToken = (token: string) => {
   setCookie("YODI_TOKEN", token);
 }
 

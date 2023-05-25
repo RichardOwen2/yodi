@@ -9,10 +9,44 @@ import { MdLocationPin } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { BASEURL } from "@/config";
 
+import type { AccountStatus } from "@prisma/client";
+
 interface IParams {
   params: {
     itemId: string;
   }
+}
+
+interface itemDetailData {
+  id: string;
+  title: string;
+  seller: {
+    id: string;
+    user: {
+      username: string;
+      email: string;
+      status: AccountStatus;
+    };
+    city: string;
+    verifiedAt: Date | null;
+  };
+  itemVariant: {
+    label: string;
+    price: number;
+    stock: number;
+  }[];
+  itemImage: {
+    image: string;
+  }[];
+  createdAt: Date;
+  updatedAt: Date;
+  verifiedAt: Date | null;
+}
+
+interface fetchData {
+  data: itemDetailData | undefined;
+  isLoading: boolean;
+  error: any;
 }
 
 
@@ -24,7 +58,7 @@ const itemDetail = ({ params: { itemId } }: IParams) => {
     }
   }).then(res => res.data.data.item)
 
-  const { data, isLoading, error } = useSWR(`${BASEURL}/api/admin/item/${itemId}`, fetcher)
+  const { data, isLoading, error }: fetchData = useSWR(`${BASEURL}/api/admin/item/${itemId}`, fetcher)
   const [selectedImage, setSelectedImage] = useState<undefined | string>();
 
   useEffect(() => {
@@ -32,23 +66,35 @@ const itemDetail = ({ params: { itemId } }: IParams) => {
       setSelectedImage(data.itemImage[0].image);
     }
   }, [data])
+
   if (isLoading) return <div>loading...</div>
 
+  if (error) {
+    return (
+      <div>
+        {error.meesage}
+      </div>
+    )
+  };
+
+  if (!data) return;
 
   return (
     <div className="lg:flex flex-row justify-between gap-8 mt-3 bg-white w-full py-8 px-16 rounded-lg">
       <div className="w-full">
-        <Image
-          className="cursor-pointer"
-          src={selectedImage || data.itemImage[0]}
-          height={400}
-          width={400}
-          alt="Logo"
-        />
+        <div className="relative pt-[100%]">
+          <Image
+            className="cursor-pointer"
+            src={selectedImage || data.itemImage[0].image}
+            objectFit="cover"
+            fill
+            alt="Logo"
+          />
+        </div>
         <div className="w-full flex flex-row gap-3 my-2 overflow-x-scroll">
           {data.itemImage.map((image: any) =>
             <Image
-              onClick={()=> setSelectedImage(image.image)}
+              onClick={() => setSelectedImage(image.image)}
               className="rounded-xl cursor-pointer hover:border-2 hover:border-gray-500"
               src={image.image}
               height={80}

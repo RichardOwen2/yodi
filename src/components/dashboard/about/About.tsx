@@ -21,7 +21,7 @@ const About: React.FC<Props> = ({ data }) => {
           </p>
         </div>
         <div className="bg-[#D9D9D9] lg:w-2/3 xl:1/2 text-black ">
-          <div className="md:p-5 grid grid-cols-2 md:grid-cols-3 gap-4 justify-items-center">
+          <div className="md:p-5 grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-4 justify-items-center">
             {data.map((seller: topSellerData) =>
               <TopSeller key={seller.id} {...seller} />
             )}

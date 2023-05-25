@@ -71,6 +71,7 @@ export default function ItemTable() {
         setRows(response.data.data.items);
         setLoading(false);
       }).catch((error) => {
+        throw new Error(error.response.data.message);
         console.log(error.response.data.message);
       });
     }
