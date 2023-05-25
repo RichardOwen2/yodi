@@ -22,6 +22,7 @@ export default function RootLayout({
       <body>
         <ClientOnly>
           <AuthContext>
+            <Navbar />
             <LoginModal />
             <RegisterModal />
             <ToasterProvider />

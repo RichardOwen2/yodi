@@ -6,9 +6,8 @@ import Footer from "@/components/dashboard/Footer";
 import About from "@/components/dashboard/about/About";
 import Team from "@/components/dashboard/team/Team";
 import Navbar from '@/components/dashboard/navbar/Navbar'
-
-import ClientOnly from "@/components/ClientOnly";
 import Item from "@/components/dashboard/item/Item";
+
 import { BASEURL } from "@/config";
 
 export interface topSellerData {
@@ -35,19 +34,16 @@ export default async function Home() {
   
   return (
     <div className="">
-      <ClientOnly>
-        <Navbar />
         <Banner />
         <Achievement />
-        <About data={sellers} />
-        <div className="bg-[#EFEB79] p-10 w-full">
+        <div className="bg-[#EFEB79] py-10 sm:px-20 lg:px-36 w-full">
           <Item />
         </div>
+        <About data={sellers} />
         <div className="bg-[#EFEB79] p-10 w-full">
           <Team />
         </div>
         <Footer />
-      </ClientOnly>
     </div>
   )
 }
