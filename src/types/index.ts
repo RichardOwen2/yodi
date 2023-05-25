@@ -1,3 +1,5 @@
+import { User } from "@prisma/client";
+
 export enum UserRole {
   USER = 0,
   SELLER = 1,
@@ -54,3 +56,12 @@ export interface MidtransTransactionPayload {
     duration: number;
   };
 }
+
+
+export type SafeUser = Omit<
+  User,
+  "createdAt" | "updatedAt"
+> & {
+  createdAt: string;
+  updatedAt: string;
+};
