@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         token,
         redirect_url,
       },
-    })
+    }, { status: 201 })
   } catch (error) {
     const { data, status } = errorHandler(error);
 

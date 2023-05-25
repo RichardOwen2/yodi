@@ -6,6 +6,9 @@ generator client {
 }
 
 datasource db {
+  // provider = "postgresql"
+  // url      = env("DATABASE_URL")
+
   provider = "postgresql"
   url = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
@@ -293,10 +296,12 @@ model ItemRequest {
   itemName    String   @map("item_name")
   image       String
   description String
+  itemNote    String
   price       Int
   amount      Int
   city        String
   address     String
+  postalCode  String
   addressNote String?  @map("address_note")
   shipper     String
   createdAt   DateTime @default(now()) @map("created_at")
@@ -305,12 +310,27 @@ model ItemRequest {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   seller Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
+  ItemRequestVariant        ItemRequestVariant[]
   itemRequestStatus         ItemRequestStatus[]
   itemRequestImage          ItemRequestImage[]
   itemRequestShippingStatus ItemRequestShippingStatus[]
   itemRequestPayment        ItemRequestPayment?
 
   @@map("item_request")
+}
+
+model ItemRequestVariant {
+  id            String   @id
+  itemRequestId String   @map("item_order_id")
+  label         String
+  amount        Int
+  price         Int
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  itemRequest ItemRequest @relation(fields: [itemRequestId], references: [id], onDelete: Cascade)
+
+  @@map("item_request_variatt")
 }
 
 model ItemRequestImage {

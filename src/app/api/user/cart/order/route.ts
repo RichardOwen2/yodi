@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       status: "success",
       message: `Berhasil melakukan order ${title}`,
-    });
+    }, { status: 201 });
   } catch (error) {
     const { data, status } = errorHandler(error);
 

@@ -4,11 +4,9 @@ import errorHandler from "@/backend/utils/errorHandler";
 import getTokenHandler from "@/backend/utils/getTokenHandler";
 
 import verifyUserAccess from "@/backend/services/user";
-import getPaginationParams from "@/backend/utils/getPaginationParams";
 
-import { validatePostOrderPayload } from "@/backend/validators/user/orderValidator";
-
-import { getOrders, getOrdersBySearch, orderItem } from "@/backend/services/user/orderService";
+import { validatePostItemRequestPayload } from "@/backend/validators/user/requestValidator";
+import { addItemRequestByItemId, getItemRequestByUser } from "@/backend/services/user/itemService";
 
 
 export async function GET(request: Request) {
@@ -16,27 +14,12 @@ export async function GET(request: Request) {
     const userId = getTokenHandler(request);
     verifyUserAccess(userId);
 
-    const { searchParams } = new URL(request.url);
-    const { page, itemCount } = getPaginationParams(searchParams);
-    const search = searchParams.get("search");
-
-    if (search) {
-      const orders = await getOrdersBySearch(userId, search, { page, itemCount });
-
-      return NextResponse.json({
-        status: "success",
-        data: {
-          orders
-        },
-      });
-    }
-
-    const orders = await getOrders(userId, { page, itemCount });
+    const itemRequest = await getItemRequestByUser(userId);
 
     return NextResponse.json({
       status: "success",
       data: {
-        orders
+        itemRequest,
       },
     });
   } catch (error) {
@@ -55,14 +38,14 @@ export async function POST(request: Request) {
     verifyUserAccess(userId);
 
     const body = await request.json();
-    validatePostOrderPayload(body);
+    validatePostItemRequestPayload(body);
 
-    const title = await orderItem(userId, body);
+    const itemName = await addItemRequestByItemId(userId, body);
 
     return NextResponse.json({
       status: "success",
-      message: `Berhasil melakukan checkout ${title}`
-    }, { status: 201 })
+      message: `Berhasil melakukan request ${itemName}`,
+    }, { status: 201 });
   } catch (error) {
     const { data, status } = errorHandler(error);
 
@@ -72,4 +55,3 @@ export async function POST(request: Request) {
     }, { status });
   }
 }
-
