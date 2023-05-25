@@ -17,6 +17,7 @@ import Modal from "./Modal";
 import Input from "../inputs/Input";
 import useRegisterModal from "@/hooks/useRegisterModal";
 import { setToken } from "@/utils/auth"
+import { BASEURL } from "@/config";
 
 const LoginModal = () => {
   const router = useRouter();
@@ -40,7 +41,7 @@ const LoginModal = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
   
     setIsLoading(true);
-    axios.post(`api/login`,{
+    axios.post(`${BASEURL}/api/login`,{
       ...data
     }).then((response)=>{
       setToken(response.data.data.token)

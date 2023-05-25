@@ -19,6 +19,7 @@ import Button from "../Button";
 import useRegisterModal from "@/hooks/useRegisterModal";
 import useLoginModal from "@/hooks/useLoginModal";
 import { setToken } from "@/utils/auth"
+import { BASEURL } from "@/config";
 
 const RegisterModal= () => {
   const registerModal = useRegisterModal();
@@ -41,7 +42,7 @@ const RegisterModal= () => {
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
-    axios.post(`api/register`,{
+    axios.post(`${BASEURL}/api/register`,{
       ...data
     }).then((response)=>{
       setToken(response.data.data.token)

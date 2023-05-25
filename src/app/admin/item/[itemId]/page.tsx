@@ -7,6 +7,7 @@ import { getToken } from "@/utils/auth";
 import Image from "next/image";
 import { MdLocationPin } from "react-icons/md";
 import { useEffect, useState } from "react";
+import { BASEURL } from "@/config";
 
 interface IParams {
   params: {
@@ -23,7 +24,7 @@ const itemDetail = ({ params: { itemId } }: IParams) => {
     }
   }).then(res => res.data.data.item)
 
-  const { data, isLoading, error } = useSWR(`api/admin/item/${itemId}`, fetcher)
+  const { data, isLoading, error } = useSWR(`${BASEURL}/api/admin/item/${itemId}`, fetcher)
   const [selectedImage, setSelectedImage] = useState<undefined | string>();
 
   useEffect(() => {

@@ -3,12 +3,14 @@
 import { AiOutlineArrowRight } from "react-icons/ai";
 import TopSeller from "./TopSeller";
 
-interface AboutProps{
-  data: any[];
+import type { topSellerData } from "@/app/page";
+
+interface Props {
+  data: topSellerData[]
 }
 
-const About:React.FC<AboutProps> = ( data ) => {
-  
+const About: React.FC<Props> = ({ data }) => {
+
   return (
     <div className="bg-[#EFEB79] pt-16 md:pt-36 pb-20 sm:px-20 lg:px-36">
       <div className="bg-white lg:flex flex-row py-12 px-10 xl:px-28">
@@ -20,8 +22,8 @@ const About:React.FC<AboutProps> = ( data ) => {
         </div>
         <div className="bg-[#D9D9D9] lg:w-2/3 xl:1/2 text-black ">
           <div className="md:p-5 grid grid-cols-2 md:grid-cols-3 gap-4 justify-items-center">
-            {data.data.map((seller: any) => 
-              <TopSeller key={seller.id} name={seller.user.username} city={seller.city} src={seller.user.image} />
+            {data.map((seller: topSellerData) =>
+              <TopSeller key={seller.id} {...seller} />
             )}
           </div>
           <div className="p-10 bg-[#EFEB79] text-center font-bold text-sm md:text-xl">YODI TOP SELLER</div>

@@ -5,6 +5,7 @@ import useSWR from "swr";
 
 import { getToken } from "@/utils/auth";
 import Image from "next/image";
+import { BASEURL } from "@/config";
 
 interface IParams {
   params: {
@@ -20,7 +21,7 @@ const userDetail = ({ params: { userId } }: IParams) => {
     }
   }).then(res => res.data.data.account)
 
-  const { data, isLoading, error } = useSWR(`api/admin/account/${userId}`, fetcher)
+  const { data, isLoading, error } = useSWR(`${BASEURL}/api/admin/account/${userId}`, fetcher)
 
   if (isLoading) return <div>loading...</div>
 

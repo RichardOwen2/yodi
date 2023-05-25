@@ -9,20 +9,30 @@ import Navbar from '@/components/dashboard/navbar/Navbar'
 
 import ClientOnly from "@/components/ClientOnly";
 import Item from "@/components/dashboard/item/Item";
+import { BASEURL } from "@/config";
 
-const topSeller = async () => {
+export interface topSellerData {
+  id: string;
+  user: {
+    image: string | null;
+    username: string;
+  };
+  city: string;
+}
+
+const topSeller = async (): Promise<topSellerData[]> => {
   try {
-    const response = await axios.get(`api/seller/top`);
+    const response = await axios.get(`${BASEURL}/api/seller/top`);
     return response.data.data.sellers;
   } catch (error: any) {
-    console.log(error.message);
+    console.log(error);
     return []; // return an empty array in case of error
   }
 }
 
 export default async function Home() {
   const sellers = await topSeller();
-
+  
   return (
     <div className="">
       <ClientOnly>
