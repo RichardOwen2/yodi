@@ -7,12 +7,12 @@ import About from "@/components/dashboard/about/About";
 import Team from "@/components/dashboard/team/Team";
 import Navbar from '@/components/dashboard/navbar/Navbar'
 
-import { BASEAPIURL } from "@/config";
 import ClientOnly from "@/components/ClientOnly";
+import Item from "@/components/dashboard/item/Item";
 
 const topSeller = async () => {
   try {
-    const response = await axios.get(`${BASEAPIURL}/seller/top`);
+    const response = await axios.get(`api/seller/top`);
     return response.data.data.sellers;
   } catch (error: any) {
     console.log(error.message);
@@ -30,6 +30,9 @@ export default async function Home() {
         <Banner />
         <Achievement />
         <About data={sellers} />
+        <div className="bg-[#EFEB79] p-10 w-full">
+          <Item />
+        </div>
         <div className="bg-[#EFEB79] p-10 w-full">
           <Team />
         </div>

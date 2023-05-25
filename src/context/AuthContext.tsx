@@ -5,7 +5,6 @@ import { getCookie } from 'cookies-next';
 import axios from 'axios';
 import { AccountStatus } from '@prisma/client';
 
-import { BASEAPIURL } from '@/config';
 import { getToken } from '@/utils/auth';
 
 interface Props {
@@ -56,7 +55,7 @@ export default function AuthContext({ children }: Props) {
         return;
       }
 
-      const response = await axios.get(`${BASEAPIURL}/user/me`, {
+      const response = await axios.get(`api/user/me`, {
         headers: {
           Authorization: `Bearer ${jwt}`,
         },

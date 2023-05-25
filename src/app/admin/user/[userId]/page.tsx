@@ -3,7 +3,6 @@
 import axios from "axios";
 import useSWR from "swr";
 
-import { BASEAPIURL } from "@/config";
 import { getToken } from "@/utils/auth";
 import Image from "next/image";
 
@@ -21,7 +20,7 @@ const userDetail = ({ params: { userId } }: IParams) => {
     }
   }).then(res => res.data.data.account)
 
-  const { data, isLoading, error } = useSWR(`${BASEAPIURL}/admin/account/${userId}`, fetcher)
+  const { data, isLoading, error } = useSWR(`api/admin/account/${userId}`, fetcher)
 
   if (isLoading) return <div>loading...</div>
 

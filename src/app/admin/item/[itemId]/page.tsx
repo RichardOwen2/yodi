@@ -3,10 +3,10 @@
 import axios from "axios";
 import useSWR from "swr";
 
-import { BASEAPIURL } from "@/config";
 import { getToken } from "@/utils/auth";
 import Image from "next/image";
 import { MdLocationPin } from "react-icons/md";
+import { useEffect, useState } from "react";
 
 interface IParams {
   params: {
@@ -16,33 +16,42 @@ interface IParams {
 
 
 const itemDetail = ({ params: { itemId } }: IParams) => {
+
   const fetcher = (url: string) => axios.get(url, {
     headers: {
       Authorization: `Bearer ${getToken()}`
     }
   }).then(res => res.data.data.item)
 
-  const { data, isLoading, error } = useSWR(`${BASEAPIURL}/admin/item/${itemId}`, fetcher)
+  const { data, isLoading, error } = useSWR(`api/admin/item/${itemId}`, fetcher)
+  const [selectedImage, setSelectedImage] = useState<undefined | string>();
 
+  useEffect(() => {
+    if (data) {
+      setSelectedImage(data.itemImage[0].image);
+    }
+  }, [data])
   if (isLoading) return <div>loading...</div>
+
 
   return (
     <div className="lg:flex flex-row justify-between gap-8 mt-3 bg-white w-full py-8 px-16 rounded-lg">
       <div className="w-full">
         <Image
           className="cursor-pointer"
-          src={data.itemImage[0].image}
-          height="400"
-          width="400"
+          src={selectedImage || data.itemImage[0]}
+          height={400}
+          width={400}
           alt="Logo"
         />
         <div className="w-full flex flex-row gap-3 my-2 overflow-x-scroll">
           {data.itemImage.map((image: any) =>
             <Image
+              onClick={()=> setSelectedImage(image.image)}
               className="rounded-xl cursor-pointer hover:border-2 hover:border-gray-500"
               src={image.image}
-              height="80"
-              width="80"
+              height={80}
+              width={80}
               alt="Logo"
             />
           )}

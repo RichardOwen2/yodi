@@ -7,7 +7,6 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { MdOutlinePageview } from 'react-icons/md';
 
-import { BASEAPIURL } from "@/config";
 import axios from "axios";
 import { getToken } from "@/utils/auth"
 import { useEffect, useState } from 'react';
@@ -62,7 +61,7 @@ export default function ItemTable() {
   });
   useEffect(() => {
     const fetchItem = () => {
-      axios.get(`${BASEAPIURL}/admin/item?page=1&itemCount=500`, {
+      axios.get(`api/admin/item?page=1&itemCount=500`, {
         headers: {
           Authorization: `Bearer ${getToken()}`
         }

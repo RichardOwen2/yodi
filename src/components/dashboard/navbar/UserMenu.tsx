@@ -36,7 +36,6 @@ const UserMenu = () => {
   
 
 
-  console.log(data)
   return (
     <>
 
