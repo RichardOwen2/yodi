@@ -11,6 +11,7 @@ import axios from "axios";
 import { getToken } from "@/utils/auth"
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { BASEURL } from '@/config';
 
 const columns: GridColDef[] = [
   { field: 'username', headerName: 'Username', flex: 1, maxWidth: 230, headerClassName: 'font-bold', },
@@ -63,7 +64,7 @@ export default function UserTable() {
 
   useEffect(() => {
     const fetchUser = () => {
-      axios.get(`api/admin/account?page=1&itemCount=500`, {
+      axios.get(`${BASEURL}/api/admin/account?page=1&itemCount=500`, {
         headers: {
           Authorization: `Bearer ${getToken()}`
         }

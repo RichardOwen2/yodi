@@ -3,6 +3,7 @@
 import axios from "axios";
 import useSWR from "swr";
 import ItemCard from "./ItemCard";
+import { BASEURL } from "@/config";
 
 
 export interface ItemData {
@@ -37,7 +38,7 @@ interface FetchProps {
 const Item = () => {
   const fetcher = (url: string) => axios.get(url).then(res => res.data.data.items)
 
-  const { data, isLoading, error }: FetchProps = useSWR(`api/item?page=1&itemCount=30`, fetcher)
+  const { data, isLoading, error }: FetchProps = useSWR(`${BASEURL}/api/item?page=1&itemCount=30`, fetcher)
 
 
   if (isLoading) return <div>loading...</div>

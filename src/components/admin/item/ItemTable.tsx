@@ -11,6 +11,7 @@ import axios from "axios";
 import { getToken } from "@/utils/auth"
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { BASEURL } from '@/config';
 
 const columns: GridColDef[] = [
   { field: 'title', headerName: 'Title', flex: 1, maxWidth: 270, headerClassName: 'font-bold', },
@@ -61,7 +62,7 @@ export default function ItemTable() {
   });
   useEffect(() => {
     const fetchItem = () => {
-      axios.get(`api/admin/item?page=1&itemCount=500`, {
+      axios.get(`${BASEURL}/api/admin/item?page=1&itemCount=500`, {
         headers: {
           Authorization: `Bearer ${getToken()}`
         }
