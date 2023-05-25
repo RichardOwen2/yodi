@@ -929,10 +929,67 @@ Body Request = {
 }
 ```
 
+```TS
+Response Data = {
+  token: string;
+  redirect_url: string;
+}
+```
+
 *fail* :
 - jika sudah ada payment yang berlangsung dan belum expire
 - order tidak ditemukan
 - user tidak memiliki akses order
+
+<br>
+
+### Mendapatkan Item Request yang dilakukan
+
+<br>
+
+> GET API/USER/REQUEST
+
+<br>
+
+```TS
+Response Data = {
+  --- sosil dulu bang
+}
+```
+
+<br>
+
+### Melakukan Request Item
+
+<br>
+
+> POST API/USER/REQUEST
+
+<br>
+
+```TS
+Body Request = {
+  itemId: string;
+  image: string[]; (image dari inputan user)
+  itemNote: string;
+  variant: {
+    id: string; (id => itemVariantId)
+    amount: number;
+  }[];
+  shipperId: string;
+  addressId: string;
+}
+```
+
+```TS
+Response Message = `Berhasil melakukan request ${itemName}`
+```
+
+*fail* :
+- Item tidak ditemukan
+- Address tidak ditemukan
+- Shipper tidak ditemukan
+
 
 <br>
 
