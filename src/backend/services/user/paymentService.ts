@@ -8,6 +8,16 @@ import prisma from "@/backend/libs/prismadb"
 
 import { ALLOWED_PAYMENT } from "@/backend/libs/midtransPayment";
 import type { MidtransTransactionPayload } from "@/types";
+import { OrderStatus } from "@prisma/client";
+
+interface savePaymentNotificationParams {
+  transactionTime: Date;
+  grossAmount: number;
+  currency: string;
+  signatureKey: string;
+  orderId: string;
+  paymentType: string;
+}
 
 const _verifyOrderAccess = async (userId: string, orderId: string) => {
   const order = await prisma.itemOrder.findUnique({
@@ -169,16 +179,69 @@ export const addPayment = async (orderId: string, { token, redirect_url }: { tok
   }
 }
 
-export const getPayment = async (userId: string, orderId: string) => {
-  await _verifyOrderAccess(userId, orderId);
+// export const getPayment = async (userId: string, orderId: string) => {
+//   await _verifyOrderAccess(userId, orderId);
 
-  const payment = await prisma.itemOrderPayment.findUnique({
+//   const payment = await prisma.itemOrderPayment.findUnique({
+//     where: {
+//       itemOrderId: orderId,
+//     },
+//     select: {
+//       token: true,
+//       redirectUrl: true,
+//     },
+//   });
+// }
+
+export const savePaymentNotification = async ({
+  orderId,
+  transactionTime,
+  grossAmount,
+  currency,
+  signatureKey,
+  paymentType
+}: savePaymentNotificationParams) => {
+  const payment = await prisma.itemOrder.findUnique({
     where: {
-      itemOrderId: orderId,
+      id: orderId,
     },
     select: {
-      token: true,
-      redirectUrl: true,
+      itemOrderPayment: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
+
+  if (!payment?.itemOrderPayment?.id) {
+    throw new InvariantError("orderId Invalid");
+  }
+
+  const verify = await prisma.$transaction([
+    prisma.itemOrderPaymentDetail.create({
+      data: {
+        itemOrderPaymentId: payment.itemOrderPayment.id,
+        transactionTime,
+        grossAmount,
+        currency,
+        signatureKey,
+        paymentType
+      },
+      select: {
+        itemOrderPaymentId: true,
+      },
+    }),
+    prisma.itemOrderStatus.create({
+      data: {
+        id: `itemOrderStatus-${nanoid(16)}`,
+        itemOrderId: payment.itemOrderPayment.id,
+        status: OrderStatus.SELLER_VERIFICATION,
+      },
+    }),
+  ]);
+
+  if (!verify) {
+    throw new InvariantError("Terjadi kesalahan")
+  }
 }

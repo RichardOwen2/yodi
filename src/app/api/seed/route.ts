@@ -385,36 +385,6 @@ export async function GET(request: Request) {
           },
         ],
       },
-      {
-        id: `item-${nanoid(16)}`,
-        owner: seller[3].id,
-        title: "Baju PKI",
-        description: "Agung sayang PKI",
-        sold: 155,
-        verifiedAt: new Date(),
-        itemImage: [
-          "https://img.antaranews.com/cache/800x533/2016/05/20160530398.jpg.webp",
-          "https://pbs.twimg.com/media/CQElth0UAAA1UCC.jpg",
-          "https://cdn1-production-images-kly.akamaized.net/oHlW_Gvr-Z-ChHR_8TQ3I0fN7X0=/640x360/smart/filters:quality(75):strip_icc():format(jpeg)/kly-media-production/medias/1246821/original/079536100_1464336684-paluarit.jpg",
-        ],
-        itemVariant: [
-          {
-            label: "XL",
-            price: 68000,
-            stock: 41,
-          },
-          {
-            label: "L",
-            price: 60000,
-            stock: 41,
-          },
-          {
-            label: "S",
-            price: 57000,
-            stock: 41,
-          },
-        ],
-      },
     ]
   
     await Promise.all(item.map(async (data) => {
