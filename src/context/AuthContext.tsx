@@ -6,6 +6,7 @@ import axios from 'axios';
 import { AccountStatus } from '@prisma/client';
 
 import { getToken } from '@/utils/auth';
+import { BASEURL } from '@/config';
 
 interface Props {
   children: React.ReactNode,
@@ -55,7 +56,7 @@ export default function AuthContext({ children }: Props) {
         return;
       }
 
-      const response = await axios.get(`api/user/me`, {
+      const response = await axios.get(`${BASEURL}/api/user/me`, {
         headers: {
           Authorization: `Bearer ${jwt}`,
         },

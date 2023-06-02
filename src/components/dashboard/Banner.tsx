@@ -17,7 +17,7 @@ const Banner = () => {
           <div className="text-justify px-10">
             <h1 className="text-lg font-bold pb-3">YODI YOUR DESIGN</h1>
             <p className="">
-              YoDi adalah sebuah Startup yang bergerak dibidang fashion & craft , YoDI bekerja sebagai penengah dari pencari dan penyedia jasa sablon
+              YoDi adalah sebuah Startup yang bergerak dibidang fashion & craft, YoDI bekerja sebagai penengah dari pencari dan penyedia jasa sablon
             </p>
           </div>
           <div className="lg:mt-20 flex flex-row justify-center md:justify-normal my-4">

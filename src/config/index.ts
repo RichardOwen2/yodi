@@ -1,0 +1,1 @@
+export const BASEURL = process.env.NODE_ENV === "production" ? "https://yodi.vercel.app" : "http://localhost:3000"

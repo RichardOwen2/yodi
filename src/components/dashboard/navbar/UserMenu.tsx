@@ -14,7 +14,7 @@ import Avatar from "@/components/Avatar";
 
 const UserMenu = () => {
   const router = useRouter();
-  const {data} = useContext(AuthenticationContext); 
+  const {data, setData, loading} = useContext(AuthenticationContext); 
 
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
@@ -25,13 +25,13 @@ const UserMenu = () => {
   }, []);
 
   const handleLogout = () => {
-    router.push("/");
     toast((t) => (
       <span>
         Berhasil Logout
       </span>
     ));
     deleteToken();
+    setData(null);
   }
   
 
