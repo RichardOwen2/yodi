@@ -4,8 +4,6 @@ import ToasterProvider from '@/providers/ToasterProvider'
 import Navbar from '@/components/dashboard/navbar/Navbar'
 import LoginModal from '@/components/modal/LoginModal'
 import RegisterModal from '@/components/modal/RegisterModal'
-import ClientOnly from '@/components/ClientOnly'
-
 
 export const metadata = {
   title: 'YODI',
@@ -20,7 +18,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ClientOnly>
           <AuthContext>
             <Navbar />
             <LoginModal />
@@ -28,7 +25,6 @@ export default function RootLayout({
             <ToasterProvider />
             {children}
           </AuthContext>
-        </ClientOnly>
       </body>
     </html>
   )

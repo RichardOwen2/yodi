@@ -4,17 +4,16 @@ import { useCallback, useState, useContext } from "react";
 import { AiFillProfile, AiOutlineMenu, AiOutlineShoppingCart } from "react-icons/ai"
 import MenuItem from "./MenuItem";
 import useLoginModal from "@/hooks/useLoginModal";
-import useRegisterMOdal from "@/hooks/useRegisterModal";
 import useRegisterModal from "@/hooks/useRegisterModal";
 import { deleteToken, getToken } from "@/utils/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import {AuthenticationContext} from "@/context/AuthContext";
+import { AuthenticationContext } from "@/context/AuthContext";
 import Avatar from "@/components/Avatar";
 
 const UserMenu = () => {
   const router = useRouter();
-  const {data, setData, loading} = useContext(AuthenticationContext); 
+  const { data, setData, loading } = useContext(AuthenticationContext);
 
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
@@ -33,7 +32,7 @@ const UserMenu = () => {
     deleteToken();
     setData(null);
   }
-  
+
 
 
   return (
@@ -46,10 +45,10 @@ const UserMenu = () => {
               <div
                 onClick={toggleOpen}
                 className="p-4 md:py-1 md:pr-3 flex flex-row justify-between items-center gap-6 cursor-pointer border-2 border-white bg-white rounded-full hover:shadow-md transition">
-                  <AiOutlineMenu />
-                  <div className="hidden md:block">
-                    <Avatar src={data.image || undefined} width={30} height={30} />
-                  </div>
+                <AiOutlineMenu />
+                <div className="hidden md:block">
+                  <Avatar src={data.image || undefined} width={30} height={30} />
+                </div>
               </div>
             </div>
             {isOpen && (
