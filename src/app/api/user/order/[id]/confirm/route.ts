@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 
-import verifyAdminAccess from "@/backend/services/admin";
+import errorHandler from "@/backend/utils/errorHandler";
 import getTokenHandler from "@/backend/utils/getTokenHandler";
 
-import errorHandler from "@/backend/utils/errorHandler";
-import { banAccountById } from "@/backend/services/admin/accountService";
+import verifyUserAccess from "@/backend/services/user";
+
+import { finishOrderById } from "@/backend/services/user/orderService";
 
 interface Params {
   params: {
@@ -14,15 +15,15 @@ interface Params {
 
 export async function POST(request: Request, { params: { id } }: Params) {
   try {
-    const adminId = getTokenHandler(request);
-    await verifyAdminAccess(adminId)
+    const userId = getTokenHandler(request);
+    verifyUserAccess(userId);
 
-    await banAccountById(id);
+    const title = await finishOrderById(userId, id);
 
     return NextResponse.json({
       status: "success",
-      message: "Berhasil melakukan ban terhadap akun"
-    })
+      message: `Berhasil menyelesaikan orderan ${title}`
+    });
   } catch (error) {
     const { data, status } = errorHandler(error);
 

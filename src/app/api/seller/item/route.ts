@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     const sellers = await getItemBySeller(sellerPagination, itemCount);
 
     return NextResponse.json({
-      message: "success",
+      status: "success",
       data: {
         sellers,
       },
@@ -32,8 +32,7 @@ export async function GET(request: Request) {
     const { data, status } = errorHandler(error);
 
     return NextResponse.json({
-      status: data.status,
-      message: data.message,
+      ...data
     }, { status });
   }
 }

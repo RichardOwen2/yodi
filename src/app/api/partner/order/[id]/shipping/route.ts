@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 
-import verifyAdminAccess from "@/backend/services/admin";
 import getTokenHandler from "@/backend/utils/getTokenHandler";
-
 import errorHandler from "@/backend/utils/errorHandler";
-import { banAccountById } from "@/backend/services/admin/accountService";
+
+import verifySellerAccess from "@/backend/services/seller";
+
+import { updateOrderStatus } from "@/backend/services/seller/orderService";
+import { OrderStatus } from "@prisma/client";
 
 interface Params {
   params: {
@@ -14,15 +16,15 @@ interface Params {
 
 export async function POST(request: Request, { params: { id } }: Params) {
   try {
-    const adminId = getTokenHandler(request);
-    await verifyAdminAccess(adminId)
+    const userId = getTokenHandler(request);
+    await verifySellerAccess(userId);
 
-    await banAccountById(id);
+    const item = await updateOrderStatus(userId, id, OrderStatus.SHIPPING);
 
     return NextResponse.json({
       status: "success",
-      message: "Berhasil melakukan ban terhadap akun"
-    })
+      message: `Berhasil mengubah status ${item}`
+    });
   } catch (error) {
     const { data, status } = errorHandler(error);
 

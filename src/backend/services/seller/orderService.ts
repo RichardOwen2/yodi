@@ -9,6 +9,7 @@ import type { PaginationParams } from "@/types";
 import { OrderStatus } from "@prisma/client";
 import AuthorizationError from "@/backend/errors/AuthorizationError";
 
+
 export const getOrders = async (sellerId: string, { page, itemCount }: PaginationParams) => {
   if (page < 1 || itemCount < 1) {
     throw new InvariantError("Page dan itemcount tidak boleh kurang dari 1");
@@ -33,7 +34,7 @@ export const getOrders = async (sellerId: string, { page, itemCount }: Paginatio
   return orders;
 }
 
-export const getOrdersById = async (sellerId: string, orderId: string) => {
+export const getOrderById = async (sellerId: string, orderId: string) => {
   const order = await prisma.itemOrder.findFirst({
     where: {
       id: orderId,
@@ -44,7 +45,7 @@ export const getOrdersById = async (sellerId: string, orderId: string) => {
   });
 
   if (!order) {
-    throw new InvariantError("Order tidak ditemukan");
+    throw new NotFoundError("Order tidak ditemukan");
   }
 
   if (order.sellerId !== sellerId) {
@@ -54,7 +55,7 @@ export const getOrdersById = async (sellerId: string, orderId: string) => {
   return order;
 }
 
-export const verifyOrderById = async (sellerId: string, orderId: string) => {
+export const updateOrderStatus = async (sellerId: string, orderId: string, status: OrderStatus) => {
   const order = await prisma.itemOrder.findFirst({
     where: {
       id: orderId,
@@ -72,22 +73,22 @@ export const verifyOrderById = async (sellerId: string, orderId: string) => {
   });
 
   if (!order) {
-    throw new InvariantError("Order tidak ditemukan");
+    throw new NotFoundError("Order tidak ditemukan");
   }
 
   if (order.sellerId !== sellerId) {
     throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
   }
 
-  if (order.itemOrderStatus.some(({status}) => status === OrderStatus.PRODUCT_PROCESS)) {
-    throw new InvariantError("Item Order telah diverifikasi sebelumnya");
+  if (order.itemOrderStatus.some(({status: orderStats}) => orderStats === status)) {
+    throw new InvariantError(`Item telah ${status} sebelumnya`);
   }
 
   const verify = await prisma.itemOrderStatus.create({
     data: {
       id: `itemOrderStatus-${nanoid(16)}`,
       itemOrderId: order.id,
-      status: OrderStatus.PRODUCT_PROCESS,
+      status,
     },
     select: {
       id: true,
@@ -98,5 +99,5 @@ export const verifyOrderById = async (sellerId: string, orderId: string) => {
     throw new InvariantError("Terjadi kesalahan");
   }
 
-  return order.title;
+  return order.id;
 }

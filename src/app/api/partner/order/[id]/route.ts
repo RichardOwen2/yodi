@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 
-import verifyAdminAccess from "@/backend/services/admin";
 import getTokenHandler from "@/backend/utils/getTokenHandler";
-
 import errorHandler from "@/backend/utils/errorHandler";
-import { getAccountById } from "@/backend/services/admin/accountService";
+
+import verifySellerAccess from "@/backend/services/seller";
+
+import { getOrderById } from "@/backend/services/seller/orderService";
 
 interface Params {
   params: {
@@ -14,17 +15,17 @@ interface Params {
 
 export async function GET(request: Request, { params: { id } }: Params) {
   try {
-    const adminId = getTokenHandler(request);
-    await verifyAdminAccess(adminId)
+    const userId = getTokenHandler(request);
+    await verifySellerAccess(userId);
 
-    const account = await getAccountById(id);
+    const order = await getOrderById(userId, id);
 
     return NextResponse.json({
       status: "success",
       data: {
-        account
+        order,
       },
-    })
+    });
   } catch (error) {
     const { data, status } = errorHandler(error);
 
