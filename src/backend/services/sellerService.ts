@@ -136,7 +136,7 @@ export const getSellerDetailById = async (id: string) => {
 }
 
 export const getItemBySellerId = async (id: string, { page, itemCount }: PaginationParams) => {
-  const items = await prisma.seller.findMany({
+  const items = await prisma.seller.findFirst({
     where: {
       id,
       verifiedAt: {

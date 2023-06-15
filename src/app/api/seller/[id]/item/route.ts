@@ -22,9 +22,7 @@ export async function GET(request: Request, { params: { id } }: Params) {
 
     return NextResponse.json({
       status: "success",
-      data: {
-        items,
-      },
+      data: items
     });
   } catch (error) {
     const { data, status } = errorHandler(error);

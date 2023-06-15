@@ -352,8 +352,7 @@ Response Data =
 
 Response Data = 
 ```TS
-{
-  items: [
+[
     {
       item: {
         id: string;
@@ -372,8 +371,7 @@ Response Data =
       }
     },
     { ... },
-  ]
-};
+]
 ```
 <br>
 
