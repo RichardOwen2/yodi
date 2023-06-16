@@ -7,15 +7,17 @@ export default function handler(req, res) {
 
   // Set the response headers to indicate a downloadable APK file
   res.setHeader('Content-Type', 'application/vnd.android.package-archive');
-  res.setHeader('Content-Disposition', 'attachment; filename="largeFile.apk"');
+  res.setHeader('Content-Disposition', 'attachment; filename="yodi.apk"');
 
-  // Create a read stream for the APK file
-  const stream = fs.createReadStream(filePath);
+  // Create a readable stream for the APK file
+  const fileStream = fs.createReadStream(filePath);
 
-  // Stream the APK file content to the response
-  stream.pipe(res);
+  // Enable chunked encoding for progressive response
+  res.setHeader('Transfer-Encoding', 'chunked');
+
+  // Stream the file content to the response in chunks
+  fileStream.pipe(res);
 }
-
 export const config = {
   api: {
     responseLimit: false,
