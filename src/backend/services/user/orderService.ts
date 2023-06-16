@@ -13,6 +13,7 @@ import { checkIfTheItemAvailable, getItemVariantStockById } from "../itemService
 import { checkUserPhoneNumber } from "./accountService";
 import { getAddressById } from "./addressService";
 import { getShipperById } from "../shipperService";
+import AuthorizationError from "@/backend/errors/AuthorizationError";
 
 interface OrderParams {
   addressId: string;
@@ -312,4 +313,47 @@ export const getOrderById = async (userId: string, orderId: string) => {
   }
 
   return order;
+}
+
+export const finishOrderById = async (userId: string, orderId: string) => {
+  const order = await prisma.itemOrder.findUnique({
+    where: {
+      id: orderId,
+    },
+    select: {
+      id: true,
+      title: true,
+      userId: true,
+      itemOrderStatus: true,
+    },
+  });
+  
+  if (!order) {
+    throw new NotFoundError("Order tidak ditemukan");
+  }
+
+  if (order.userId !== userId) {
+    throw new AuthorizationError("Anda tidak berhak melakukan ini");
+  }
+
+  if (!order.itemOrderStatus.some(({status}) => status === OrderStatus.ARRIVE)) {
+    throw new InvariantError("Order belum dapat diselesaikan");
+  }
+
+  const verify = await prisma.itemOrderStatus.create({
+    data: {
+      id: `itemOrderStatus-${nanoid(16)}`,
+      itemOrderId: order.id,
+      status: OrderStatus.DONE,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!verify) {
+    throw new InvariantError("Terjadi kesalahan");
+  }
+
+  return order.title;
 }

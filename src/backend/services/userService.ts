@@ -117,7 +117,7 @@ export const verifyUserCrendential = async ({ email, password }: verifyUserCrend
   });
 
   if (!user) {
-    throw new AuthenticationError("Kredensial yang Anda berikan salah");
+    throw new AuthenticationError("Email atau password yang Anda berikan salah");
   }
 
   const { id, password: hashedPassword } = user;
@@ -125,7 +125,7 @@ export const verifyUserCrendential = async ({ email, password }: verifyUserCrend
   const isMatch = await bcrypt.compare(password, hashedPassword);
 
   if (!isMatch) {
-    throw new AuthenticationError("Kredensial yang Anda berikan salah");
+    throw new AuthenticationError("Email atau password yang Anda berikan salah");
   }
 
   return id;

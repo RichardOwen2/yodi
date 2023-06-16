@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       const items = await getItemsBySeller(userId, { page, itemCount });
 
       return NextResponse.json({
-        message: "success",
+        status: "success",
         data: {
           items,
         },
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     const items = await getVerifiedItemsBySeller(userId, { page, itemCount });
 
     return NextResponse.json({
-      message: "success",
+      status: "success",
       data: {
         items,
       },
@@ -44,8 +44,7 @@ export async function GET(request: Request) {
     const { data, status } = errorHandler(error);
 
     return NextResponse.json({
-      status: data.status,
-      message: data.message,
+      ...data
     }, { status });
   }
 }
@@ -68,8 +67,7 @@ export async function POST(request: Request) {
     const { data, status } = errorHandler(error);
 
     return NextResponse.json({
-      status: data.status,
-      message: data.message,
+      ...data
     }, { status });
   }
 }

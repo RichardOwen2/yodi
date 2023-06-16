@@ -49,6 +49,11 @@ interface fetchData {
   error: any;
 }
 
+interface ItemVariant {
+  label: string;
+  price: number;
+  stock: number;
+}
 
 const itemDetail = ({ params: { itemId } }: IParams) => {
 
@@ -60,10 +65,12 @@ const itemDetail = ({ params: { itemId } }: IParams) => {
 
   const { data, isLoading, error }: fetchData = useSWR(`${BASEURL}/api/admin/item/${itemId}`, fetcher)
   const [selectedImage, setSelectedImage] = useState<undefined | string>();
+  const [selectedVariant, setSelectedVariant] = useState<ItemVariant | undefined>();
 
   useEffect(() => {
     if (data) {
       setSelectedImage(data.itemImage[0].image);
+      setSelectedVariant(data.itemVariant[0]);
     }
   }, [data])
 
@@ -118,9 +125,9 @@ const itemDetail = ({ params: { itemId } }: IParams) => {
             <div className="text-gray-700">{data.itemVariant[0].label}</div>
           </div>
           <div className="mb-5">
-            {data.itemVariant.map((variant: any) =>
+            {data.itemVariant.map((variant: ItemVariant) =>
               <button
-                onClick={() => { alert(variant.label) }}
+                onClick={() => setSelectedVariant(variant) }
                 className="bg-white border-2 py-1 px-5 mx-1 rounded-xl">
                 {variant.label}
               </button>

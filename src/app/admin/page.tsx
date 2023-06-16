@@ -1,12 +1,9 @@
 import Avatar from "@/components/Avatar";
-import ClientOnly from "@/components/ClientOnly";
 import AccountReport from "@/components/admin/AccountReport";
 import IncomeCard from "@/components/admin/IncomeCard";
 import ItemReport from "@/components/admin/ItemReport";
 import MonthlyReport from "@/components/admin/MonthlyReport";
 import WeeklyReport from "@/components/admin/WeeklyReport";
-import Navbar from "@/components/navbar/Navbar";
-import Sidebar from "@/components/sidebar/Sidebar";
 
 const data = {
   labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],

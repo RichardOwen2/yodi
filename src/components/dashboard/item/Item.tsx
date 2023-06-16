@@ -42,7 +42,7 @@ const Item = () => {
 
 
   if (isLoading) return <div>loading...</div>
-  if (!data) return <div></div>
+  if (!data) return <div>Error</div>
   console.log(data)
   return (
     <div className="items-center justify-center bg-white text-black py-8 px-5 lg:px-10 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-3">

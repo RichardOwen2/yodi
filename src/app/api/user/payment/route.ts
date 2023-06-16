@@ -8,7 +8,7 @@ import verifyUserAccess from "@/backend/services/user";
 import { createTransaction } from "@/backend/libs/midtransPayment";
 
 import { validatePostPaymentPayload } from "@/backend/validators/user/paymentValidator";
-import { addPayment, createTransactionData, verifyAbleToCreatePayment } from "@/backend/services/user/orderPaymentService";
+import { addPayment, createTransactionData, verifyAbleToCreatePayment } from "@/backend/services/user/paymentService";
 
 
 export async function POST(request: Request) {
@@ -41,8 +41,7 @@ export async function POST(request: Request) {
     const { data, status } = errorHandler(error);
 
     return NextResponse.json({
-      status: data.status,
-      message: data.message,
+      ...data
     }, { status });
   }
 }

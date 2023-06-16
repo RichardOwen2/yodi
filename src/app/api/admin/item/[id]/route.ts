@@ -20,7 +20,7 @@ export async function GET(request: Request, { params: { id } }: Params) {
     const item = await getItemById(id);
 
     return NextResponse.json({
-      message: "success",
+      status: "success",
       data: {
         item,
       },
@@ -29,8 +29,7 @@ export async function GET(request: Request, { params: { id } }: Params) {
     const { data, status } = errorHandler(error);
 
     return NextResponse.json({
-      status: data.status,
-      message: data.message,
+      ...data
     }, { status });
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { toast } from "react-hot-toast";
 import { signIn } from 'next-auth/react';
 import {
@@ -18,9 +18,10 @@ import Input from "../inputs/Input";
 import useRegisterModal from "@/hooks/useRegisterModal";
 import { setToken } from "@/utils/auth"
 import { BASEURL } from "@/config";
+import { AuthenticationContext } from "@/context/AuthContext";
 
 const LoginModal = () => {
-  const router = useRouter();
+  const { fetchUser } = useContext(AuthenticationContext);
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,6 @@ const LoginModal = () => {
   });
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
-  
     setIsLoading(true);
     axios.post(`${BASEURL}/api/login`,{
       ...data
@@ -47,6 +47,7 @@ const LoginModal = () => {
       setToken(response.data.data.token)
       toast.success('Logged in');
       loginModal.onClose();
+      fetchUser();
     }).catch((error)=>{
       toast.error(error.response.data.message);
     });
