@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid'; // Grid version 1
 import { AiOutlineArrowDown } from 'react-icons/ai'
 import Link from "next/link";
 import { FaAppStoreIos, FaGooglePlay } from "react-icons/fa";
+import { BASEURL } from "@/config";
 
 const Banner = () => {
   return (
@@ -20,22 +21,18 @@ const Banner = () => {
               YoDi adalah sebuah Startup yang bergerak dibidang fashion & craft, YoDI bekerja sebagai penengah dari pencari dan penyedia jasa sablon
             </p>
           </div>
-          <div className="lg:mt-20 flex flex-row justify-center md:justify-normal my-4">
+          <a href={`${BASEURL}/api/app`} className="lg:mt-20 flex flex-row justify-center md:justify-normal my-4">
             <div className="mx-2 flex flex-row hover:cursor-pointer">
-              <Link href={""}>
-                <FaAppStoreIos className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]" />
-              </Link>
+              <FaAppStoreIos className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]" />
               <p className="font-bold text-sm md:text-xl px-3 m-auto">App Store</p>
               {/* <Image src="/images/iphone_download.png" alt="" width="160" height="100" /> */}
             </div>
             <div className="mx-2 flex flex-row hover:cursor-pointer">
-              <Link href={""}>
-                <FaGooglePlay className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]" />
-              </Link>
+              <FaGooglePlay className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]" />
               <p className="font-bold text-sm md:text-xl px-3 m-auto">Google Play</p>
               {/* <Image src="/images/google_play_download.png" alt="" width="160" height="100" /> */}
             </div>
-          </div>
+          </a>
         </div>
         <div className="hidden lg:block px-5 lg:w-1/2">
           <Image src="/images/design_clothes.png" alt="" width="300" height="40" className="mx-auto" />
