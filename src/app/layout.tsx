@@ -1,9 +1,5 @@
 import './globals.css'
 import AuthContext from '@/context/AuthContext'
-import ToasterProvider from '@/providers/ToasterProvider'
-import Navbar from '@/components/dashboard/navbar/Navbar'
-import LoginModal from '@/components/modal/LoginModal'
-import RegisterModal from '@/components/modal/RegisterModal'
 import ClientOnly from '@/components/ClientOnly'
 
 
@@ -22,10 +18,6 @@ export default function RootLayout({
       <body>
         <ClientOnly>
           <AuthContext>
-            <Navbar />
-            <LoginModal />
-            <RegisterModal />
-            <ToasterProvider />
             {children}
           </AuthContext>
         </ClientOnly>

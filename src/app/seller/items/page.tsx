@@ -1,4 +1,4 @@
-import ItemTable from "@/components/admin/item/ItemTable";
+import ItemTable from "@/components/seller/item/ItemTable";
 
 
 const Item = () => {
