@@ -1,0 +1,13 @@
+{
+  "routes": [
+    {
+      "src": "/api/app",
+      "methods": ["GET"],
+      "dest": "pages/api/app.js",
+      "headers": {
+        "x-zeit-co-forwarded-for": "*"
+      },
+      "timeout": 60
+    }
+  ]
+}

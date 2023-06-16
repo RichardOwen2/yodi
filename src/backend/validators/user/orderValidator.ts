@@ -10,7 +10,7 @@ export const validatePostOrderPayload = (payload: any) => {
         amount: Joi.number().required(),
       }).required(),
     ).min(1).required(),
-    itemNote: Joi.string().required(),
+    itemNote: Joi.string(),
     addressId: Joi.string().required(),
     shipperId: Joi.string().required(),
   });

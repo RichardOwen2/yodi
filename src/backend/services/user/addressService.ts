@@ -37,7 +37,7 @@ const _verifyAddressAccess = async (userId: string, addressId: string) => {
     throw new NotFoundError("Address tidak ditemukan");
   }
 
-  if (userAddress.userId === userId) {
+  if (userAddress.userId !== userId) {
     throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
   }
 }

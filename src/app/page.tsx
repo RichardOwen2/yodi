@@ -22,7 +22,7 @@ export interface topSellerData {
   city: string;
 }
 
-const topSeller = async (): Promise<topSellerData[]> => {
+const topSeller: () => Promise<topSellerData[]> = async () => {
   try {
     const response = await axios.get(`${BASEURL}/api/seller/top`);
     return response.data.data.sellers;
