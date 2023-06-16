@@ -389,6 +389,7 @@ Response Data =
   sellers: [
     id: string,
     city: string,
+    soldCount: number,
     user: {
       select: {
         username: string,

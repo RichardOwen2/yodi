@@ -304,7 +304,7 @@ export async function GET(request: Request) {
         sold: 16,
         verifiedAt: new Date(),
         itemImage: [
-          "https://innews.co.id/wp-content/uploads/2022/08/Screenshot_20220824_191150-1.jpg",
+          "https://innews.co.id/wp-nnnnn,s/uploads/2022/08/Screenshot_20220824_191150-1.jpg",
           "https://images.tokopedia.net/img/cache/500-square/VqbcmM/2021/12/22/0535d138-74b5-48c0-82a6-79268ad222ff.jpg",
           "https://bungonews.net/wp-content/uploads/2023/03/IMG-20230305-WA0031.jpg",
         ],

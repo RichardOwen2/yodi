@@ -92,6 +92,7 @@ export const getTopSeller = async () => {
     select: {
       id: true,
       city: true,
+      soldCount: true,
       user: {
         select: {
           username: true,
