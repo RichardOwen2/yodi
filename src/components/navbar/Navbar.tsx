@@ -4,14 +4,15 @@ import Heading from "./Heading";
 import UserMenu from "./UserMenu";
 
 interface NavbarProps {
+ authName: string;
   button?: boolean;
 }
 
-const Navbar = () => {
+const Navbar: React.FC<NavbarProps> = ({ authName }) => {
   return (
     <div>
       <div className="flex flex-row justify-between">
-        <Heading authName="Admin" />
+        <Heading authName={authName} />
         <UserMenu />
       </div>
     </div>
