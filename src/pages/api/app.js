@@ -15,3 +15,9 @@ export default function handler(req, res) {
   // Send the file content as the API response
   res.send(file);
 }
+
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+}
