@@ -20,6 +20,7 @@ export const getShipperById = async (id: string) => {
       id,
     },
     select: {
+      id: true,
       name: true,
       price: true,
       city: true,
