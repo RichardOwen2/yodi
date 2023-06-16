@@ -8,7 +8,7 @@ import { FaAppStoreIos, FaGooglePlay } from "react-icons/fa";
 
 const Banner = () => {
   return (
-    <div className="bg-[#EFEB79] pt-36 pb-20 sm:px-20 lg:px-36 relative">
+    <div id="features" className="bg-[#EFEB79] pt-36 pb-20 sm:px-20 lg:px-36 relative">
       <div className="block lg:hidden bg-white mx-10">
         <Image src="/images/design_clothes.png" alt="" width="300" height="40" className="mx-auto" />
       </div>

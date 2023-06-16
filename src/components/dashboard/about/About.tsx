@@ -12,22 +12,12 @@ interface Props {
 const About: React.FC<Props> = ({ data }) => {
 
   return (
-    <div className="bg-[#EFEB79] pt-16 md:pt-36 pb-20 sm:px-20 lg:px-36">
-      <div className="bg-white lg:flex flex-row py-12 px-10 xl:px-28">
-        <div className="text-black md:w-3/4 md:px-10">
-          <p className="text-md md:text-xl font-bold text-center">YODI CUSTOM DESIGN</p>
-          <p className="text-sm md:text-lg text-justify py-3">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel fugiat exercitationem laudantium iste amet maiores numquam ratione placeat alias, quibusdam odio ducimus dolor est? Doloribus eaque laudantium vel quas saepe?
-          </p>
-        </div>
-        <div className="bg-[#D9D9D9] lg:w-2/3 xl:1/2 text-black ">
-          <div className="md:p-5 grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-4 justify-items-center">
+    <div id="partnership" className="bg-[#EFEB79] pt-10 md:pt-28 sm:px-20 lg:px-36">
+      <div className="w-full bg-white py-1 px-1">
+        <div className="lg:flex flex-row overflow-x-scroll py-3">
             {data.map((seller: topSellerData) =>
               <TopSeller key={seller.id} {...seller} />
             )}
-          </div>
-          <div className="p-10 bg-[#EFEB79] text-center font-bold text-sm md:text-xl">YODI TOP SELLER</div>
-          <div className="pr-2 bg-[#EFEB79] text-right text-lg flex flex-row-reverse py-3 pr-5">Learn More <AiOutlineArrowRight size={25} className="pt-1" /></div>
         </div>
       </div>
     </div>

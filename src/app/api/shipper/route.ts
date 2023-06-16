@@ -18,8 +18,7 @@ export async function GET() {
     const { data, status } = errorHandler(error);
 
     return NextResponse.json({
-      status: data.status,
-      message: data.message,
+      ...data
     }, { status });
   }
 }

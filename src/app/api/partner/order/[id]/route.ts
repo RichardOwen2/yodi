@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 
+import getTokenHandler from "@/backend/utils/getTokenHandler";
 import errorHandler from "@/backend/utils/errorHandler";
 
-import getPaginationParams from "@/backend/utils/getPaginationParams";
-import { getItemBySellerId } from "@/backend/services/sellerService";
+import verifySellerAccess from "@/backend/services/seller";
+
+import { getOrderById } from "@/backend/services/seller/orderService";
 
 interface Params {
   params: {
@@ -11,18 +13,18 @@ interface Params {
   }
 }
 
-
 export async function GET(request: Request, { params: { id } }: Params) {
   try {
-    const { searchParams } = new URL(request.url);
+    const userId = getTokenHandler(request);
+    await verifySellerAccess(userId);
 
-    const { page, itemCount } = getPaginationParams(searchParams);
-
-    const items = await getItemBySellerId(id, { page, itemCount });
+    const order = await getOrderById(userId, id);
 
     return NextResponse.json({
       status: "success",
-      data: items
+      data: {
+        order,
+      },
     });
   } catch (error) {
     const { data, status } = errorHandler(error);

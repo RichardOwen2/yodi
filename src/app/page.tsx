@@ -43,10 +43,10 @@ export default async function Home() {
       <ToasterProvider />
       <Banner />
       <Achievement />
-      <div className="bg-[#EFEB79] py-10 sm:px-20 lg:px-36 w-full">
+      <About data={sellers} />
+      <div className="bg-[#EFEB79] pt-1 pb-10 sm:px-20 lg:px-36 w-full">
         <Item />
       </div>
-      <About data={sellers} />
       <div className="bg-[#EFEB79] p-10 w-full">
         <Team />
       </div>

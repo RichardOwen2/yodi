@@ -352,8 +352,7 @@ Response Data =
 
 Response Data = 
 ```TS
-{
-  items: [
+[
     {
       item: {
         id: string;
@@ -372,8 +371,7 @@ Response Data =
       }
     },
     { ... },
-  ]
-};
+]
 ```
 <br>
 
@@ -943,6 +941,30 @@ Response Data = {
 
 <br>
 
+### Menyelesaikan Orderan
+
+<br>
+
+> API/USER/ORDER/[Id]/CONFIRM
+
+*id => orderId*
+
+<br>
+
+```TS
+Response Message = `Berhasil menyelesaikan orderan ${title}`
+```
+
+<br>
+
+*fail* :
+- status order belum "arrive"
+- order tidak ditemukan
+- user tidak memiliki akses order
+
+
+<br>
+
 ### Mendapatkan Item Request yang dilakukan
 
 <br>
@@ -1210,6 +1232,148 @@ Response Data = {
 *fail* :
 - page dan itemCount kurang dari 1
 - page dan itemCount bukan number
+
+<br>
+
+### Mendapatkan Semua Orderan Item
+
+<br>
+
+> GET API/PARTNER/ORDER?page=x&itemCount=x
+
+*(hanya menampilkan orderan yang telah dibayarkan)*
+
+<br>
+
+```TS
+jika tidak memberi query page atau itemCount maka akan default 
+
+page = 1,
+itemCount = 5
+
+page -> number | undefined
+itemCount -> number | undefined
+```
+
+<br>
+
+```TS
+// Beritahu untuk kebutuhan data lainnya
+// untuk sekarang masih default database
+Response Data = [
+  {
+    id: string,
+    userId: string,
+    sellerId: string,
+    title: string,
+    description: string,
+    itemNote: string,
+    city: string,
+    address: string,
+    postalCode: string,
+    addressNote: string?,
+    shipper: string,
+    shipperPrice: number,
+    price: number,
+    amount: number,
+    createdAt: Date,
+    updatedAt: Date,
+  },
+  { ... }
+]
+```
+<br>
+
+*fail* :
+- page dan itemCount kurang dari 1
+- page dan itemCount bukan number
+
+<br>
+
+### Mendapatkan Orderan Item By Id
+
+<br>
+
+> GET API/PARTNER/ORDER/[id]
+
+*id => orderId*
+
+<br>
+
+```TS
+// Beritahu untuk kebutuhan data lainnya
+// untuk sekarang masih default database
+Response Data = {
+  id: string,
+  userId: string,
+  sellerId: string,
+  title: string,
+  description: string,
+  itemNote: string,
+  city: string,
+  address: string,
+  postalCode: string,
+  addressNote: string?,
+  shipper: string,
+  shipperPrice: number,
+  price: number,
+  amount: number,
+  createdAt: Date,
+  updatedAt: Date,
+}
+```
+
+<br>
+
+### Mengganti Status Orderan
+
+<br>
+
+> POST API/PARTNER/ORDER/[id]/(enum)
+
+*id => orderId*
+
+<br>
+
+```TS
+Note : Gunakanlah aturan dan urutan yang ada
+
+database enum =>
+
+enum OrderStatus {
+  PAYMENT             @map("Menunggu pembayaran")
+  SELLER_VERIFICATION @map("Verifikasi Seller")
+  PRODUCT_PROCESS     @map("Pesanan diproses")
+  READY               @map("Pesanan siap diantar")
+  SHIPPING            @map("Pesanan sedang diantar")
+  ARRIVE              @map("Pesanan sudah sampai tujuan")
+  DONE                @map("Pesanan selesai")
+  CANCEL              @map("Pesanan dibatalkan")
+  REJECT              @map("Pesanan ditolak")
+}
+
+API enum =>
+SELLER_VERIFICATION to PRODUCT_PROCESS === /VERIFY
+PRODUCT_PROCESS to READY === /READY
+READY to SHIPPING === /SHIPPING
+SHIPPING to ARRIVE === /ARRIVE
+
+example = 
+SELLER_VERIFICATION to PRODUCT_PROCESS
+API ROUTE => (POST API/PARTNER/ORDER/[id]/VERIFY)
+```
+
+<br>
+
+```TS
+Response Message = `Berhasil mengubah status ${item}`
+```
+
+<br>
+
+*fail* :
+- orderan tidak ditemukan
+- orderan bukan milik seller
 
 <br>
 
@@ -1612,13 +1776,13 @@ Response Message = "Berhasil mengedit shipper"
 <br>
 
 ```TS
-  Body Request: {
-    id: string (id => shipperId)
-  }
+Body Request: {
+  id: string (id => shipperId)
+}
 ```
 
 ```TS
-  Response Message = "Berhasil menghapus shipper"
+Response Message = "Berhasil menghapus shipper"
 ```
 
 <br>
@@ -1630,3 +1794,38 @@ Response Message = "Berhasil mengedit shipper"
   > Baca dokumentasi get shipper di guest
 
 
+<br>
+
+---
+
+<br>
+
+## MIDTRANS
+
+<br>
+
+### Melakukan Konfirmasi Payment
+
+<br>
+
+> POST API/USER/PAYMENT/NOTIFICATION
+
+note: *only hit this api in beta version*
+
+```TS
+Body Request = {
+  order_id: string;
+  transaction_id: string;
+  payment_type: string;
+  gross_amount: number;
+  transaction_time: Date;
+  currency: string;
+  signature_key: string;
+} 
+
+// (Menyesuaikan dengan API DOCS MIDTRANS)
+```
+
+```TS
+Response Message = `${body.order_id} payment verified`
+```

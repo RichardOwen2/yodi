@@ -23,7 +23,7 @@ export async function GET(request: Request) {
       const items = await getItemsBySellerAndSearch(search, seller, { page, itemCount });
 
       return NextResponse.json({
-        message: "success",
+        status: "success",
         data: {
           items,
         },
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
       const items = await getItemsBySearch(search, { page, itemCount });
 
       return NextResponse.json({
-        message: "success",
+        status: "success",
         data: {
           items,
         },
@@ -45,7 +45,7 @@ export async function GET(request: Request) {
       const items = await getItemsBySeller(seller, { page, itemCount });
 
       return NextResponse.json({
-        message: "success",
+        status: "success",
         data: {
           items,
         },
@@ -55,7 +55,7 @@ export async function GET(request: Request) {
     const items = await getItems({ page, itemCount });
 
     return NextResponse.json({
-      message: "success",
+      status: "success",
       data: {
         items,
       },
@@ -64,8 +64,7 @@ export async function GET(request: Request) {
     const { data, status } = errorHandler(error);
 
     return NextResponse.json({
-      status: data.status,
-      message: data.message,
+      ...data
     }, { status });
   }
 }

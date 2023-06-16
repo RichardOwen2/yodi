@@ -29,6 +29,7 @@ interface AuthState {
   setData: React.Dispatch<React.SetStateAction<User | null>>;
   error: string | null;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
+  fetchUser: () => Promise<void>;
 }
 
 export const AuthenticationContext = createContext<AuthState>({
@@ -38,6 +39,7 @@ export const AuthenticationContext = createContext<AuthState>({
   setError: () => { },
   data: null,
   setData: () => { },
+  fetchUser: async () => { },
 });
 
 export default function AuthContext({ children }: Props) {
@@ -85,7 +87,8 @@ export default function AuthContext({ children }: Props) {
     data,
     setData,
     error,
-    setError
+    setError,
+    fetchUser
   }
 
   return (

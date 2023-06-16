@@ -8,7 +8,7 @@ export async function GET() {
     const sellers = await getTopSeller();
 
     return NextResponse.json({
-      message: "success",
+      status: "success",
       data: {
         sellers,
       },
@@ -17,8 +17,7 @@ export async function GET() {
     const { data, status } = errorHandler(error);
 
     return NextResponse.json({
-      status: data.status,
-      message: data.message,
+      ...data
     }, { status });
   }
 }
