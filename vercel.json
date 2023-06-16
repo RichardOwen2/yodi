@@ -1,3 +1,10 @@
 {
-  "buildCommand": "next build"
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/app",
+      "methods": ["GET"],
+      "dest": "pages/api/app.js"
+    }
+  ]
 }
